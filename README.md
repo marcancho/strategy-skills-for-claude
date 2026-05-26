@@ -1,12 +1,7 @@
 # 21 Strategy-Consulting Strategy Skills for Claude
 
-<div align="center">
+<img width="1024" height="1536" alt="Claude OS" src="https://github.com/user-attachments/assets/e459cb00-36f4-4f12-8abd-e420487ce177" />
 
-**A GitHub-ready consulting AI operating system for top-tier Claude strategy work.**
-
-Diagnose │ Map Markets │ Choose Strategy │ Build Execution │ Govern Value │ Communicate
-
-</div>
 
 > Inspired by strategy-consulting problem solving and broader top-tier consulting consulting practice: crisp framing, MECE logic, hypothesis-led analysis, 80/20 focus, answer-first communication, and executive-ready recommendations. This collection is independent and unofficial.
 
