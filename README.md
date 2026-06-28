@@ -1,9 +1,6 @@
-# 21 Strategy-Consulting Strategy Skills for Claude
+# 21 Strategy-Consulting Skills for Claude
 
-<img width="1024" height="1536" alt="Claude OS" src="https://github.com/user-attachments/assets/e459cb00-36f4-4f12-8abd-e420487ce177" />
-
-
-> Inspired by strategy-consulting problem solving and broader top-tier consulting consulting practice: crisp framing, MECE logic, hypothesis-led analysis, 80/20 focus, answer-first communication, and executive-ready recommendations. This collection is independent and unofficial.
+> Inspired by strategy-consulting problem solving and broader top-tier consulting practice: crisp framing, MECE logic, hypothesis-led analysis, 80/20 focus, answer-first communication, and executive-ready recommendations. This collection is independent and unofficial.
 
 ## What This Is
 
@@ -11,7 +8,7 @@ This repository contains 21 standalone Claude skills for strategy work, grouped 
 
 Together, the skills operate like a consulting AI operating system for a full engagement: diagnose the problem, map the market, choose a strategic path, translate it into execution, govern value, and communicate the recommendation.
 
-The collection is designed for business builders, operators, consultants, analysts, founders, and strategy teams who want Claude to work closer to a top 1% top-tier consulting-style consultant: structured before analytical, hypothesis-led before exhaustive, and executive-ready before verbose.
+The collection is designed for business builders, operators, consultants, analysts, founders, and strategy teams who want Claude to work closer to a top 1% tier-one consultant: structured before analytical, hypothesis-led before exhaustive, and executive-ready before verbose.
 
 ```mermaid
 flowchart LR
@@ -222,7 +219,7 @@ This collection follows the Claude skill-building guide:
 
 ## Positioning Note
 
-"strategy-consulting" refers to a school of strategy problem solving: structured issue diagnosis, MECE thinking, hypothesis-led analysis, 80/20 focus, pyramid communication, and rigorous recommendation design. It is appropriate to describe these as strategy-consulting-inspired, strategy-consulting, or based on common strategy-consulting frameworks. Avoid any wording that implies strategy consulting authorship, affiliation, or endorsement.
+Strategy-consulting problem solving refers to a school of strategy problem solving: structured issue diagnosis, MECE thinking, hypothesis-led analysis, 80/20 focus, pyramid communication, and rigorous recommendation design. It is appropriate to describe these as strategy-consulting-inspired, strategy-consulting-style, or based on common tier-one consulting frameworks. Avoid any wording that implies the authorship, affiliation, or endorsement of any specific firm.
 
 ## Quality Bar
 
