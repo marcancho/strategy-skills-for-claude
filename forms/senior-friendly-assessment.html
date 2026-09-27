@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Autoavaliação Senior-Friendly</title>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 20px;
+    }
+
+    .container {
+        max-width: 900px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        overflow: hidden;
+    }
+
+    .header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 40px;
+        text-align: center;
+    }
+
+    .header h1 {
+        font-size: 2.5em;
+        margin-bottom: 10px;
+    }
+
+    .header p {
+        font-size: 1.1em;
+        opacity: 0.9;
+    }
+
+    .progress-bar {
+        background: rgba(255,255,255,0.2);
+        height: 8px;
+        border-radius: 10px;
+        margin-top: 20px;
+        overflow: hidden;
+    }
+
+    .progress-fill {
+        background: white;
+        height: 100%;
+        width: 0%;
+        transition: width 0.3s ease;
+    }
+
+    .form-content {
+        padding: 40px;
+    }
+
+    .section {
+        display: none;
+    }
+
+    .section.active {
+        display: block;
+        animation: fadeIn 0.5s ease;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .section-title {
+        font-size: 1.8em;
+        color: #667eea;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .section-subtitle {
+        color: #666;
+        margin-bottom: 30px;
+        font-size: 1.1em;
+    }
+
+    .form-group {
+        margin-bottom: 25px;
+    }
+
+    label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: #333;
+        font-size: 1.05em;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="tel"],
+    input[type="url"],
+    select,
+    textarea {
+        width: 100%;
+        padding: 12px 15px;
+        border: 2px solid #e0e0e0;
+        border-radius: 10px;
+        font-size: 1em;
+        transition: all 0.3s ease;
+        font-family: inherit;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    textarea {
+        resize: vertical;
+        min-height: 100px;
+    }
+
+    .radio-group {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-top: 10px;
+    }
+
+    .radio-option {
+        display: flex;
+        align-items: center;
+        padding: 15px;
+        border: 2px solid #e0e0e0;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: 400;
+        margin-bottom: 0;
+    }
+
+    .radio-option:hover {
+        border-color: #667eea;
+        background: #f8f9ff;
+    }
+
+    .radio-option input[type="radio"] {
+        margin-right: 12px;
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+        flex-shrink: 0;
+    }
+
+    .radio-option.selected {
+        border-color: #667eea;
+        background: #f0f4ff;
+    }
+
+    .file-upload {
+        border: 2px dashed #667eea;
+        border-radius: 10px;
+        padding: 30px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        background: #f8f9ff;
+    }
+
+    .file-upload:hover,
+    .file-upload.dragover {
+        background: #f0f4ff;
+        border-color: #764ba2;
+    }
+
+    .file-upload input[type="file"] {
+        display: none;
+    }
+
+    .file-upload-icon {
+        font-size: 3em;
+        margin-bottom: 10px;
+    }
+
+    .file-list {
+        list-style: none;
+        margin-top: 15px;
+        color: #333;
+    }
+
+    .file-list li {
+        padding: 8px 0;
+        border-bottom: 1px solid #e0e0e0;
+    }
+
+    .score-display {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 20px;
+        border-radius: 15px;
+        text-align: center;
+        margin: 20px 0;
+    }
+
+    .score-number {
+        font-size: 3em;
+        font-weight: bold;
+        margin: 10px 0;
+    }
+
+    .score-level {
+        font-size: 1.5em;
+        margin-top: 10px;
+    }
+
+    .button-group {
+        display: flex;
+        gap: 15px;
+        margin-top: 30px;
+    }
+
+    button {
+        flex: 1;
+        padding: 15px 30px;
+        border: none;
+        border-radius: 10px;
+        font-size: 1.1em;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-family: inherit;
+    }
+
+    button:focus-visible,
+    .sector-card:focus-visible,
+    .file-upload:focus-visible {
+        outline: 3px solid #764ba2;
+        outline-offset: 2px;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+    }
+
+    .btn-secondary {
+        background: #f0f0f0;
+        color: #333;
+    }
+
+    .btn-secondary:hover {
+        background: #e0e0e0;
+    }
+
+    .btn-success {
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        color: white;
+    }
+
+    .btn-success:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(17, 153, 142, 0.3);
+    }
+
+    .sector-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        margin-top: 30px;
+    }
+
+    .sector-card {
+        padding: 30px;
+        border: 2px solid #e0e0e0;
+        border-radius: 15px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        background: white;
+    }
+
+    .sector-card:hover {
+        border-color: #667eea;
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+
+    .sector-card.selected {
+        border-color: #667eea;
+        background: #f0f4ff;
+    }
+
+    .sector-icon {
+        font-size: 3em;
+        margin-bottom: 15px;
+    }
+
+    .sector-name {
+        font-size: 1.2em;
+        font-weight: 600;
+        color: #333;
+    }
+
+    .eixo-title {
+        font-size: 1.3em;
+        color: #764ba2;
+        margin: 30px 0 20px 0;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #667eea;
+    }
+
+    .question-card {
+        background: #f8f9ff;
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+    }
+
+    .question-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 15px;
+    }
+
+    .question-header label {
+        margin-bottom: 0;
+    }
+
+    .question-points {
+        background: #667eea;
+        color: white;
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.9em;
+        white-space: nowrap;
+    }
+
+    .summary-section {
+        background: #f8f9ff;
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+    }
+
+    .summary-item {
+        display: flex;
+        justify-content: space-between;
+        gap: 15px;
+        padding: 10px 0;
+        border-bottom: 1px solid #e0e0e0;
+    }
+
+    .summary-item strong {
+        white-space: nowrap;
+    }
+
+    .summary-item:last-child {
+        border-bottom: none;
+    }
+
+    input.invalid,
+    select.invalid {
+        border-color: #d9534f;
+    }
+
+    .error-message {
+        display: none;
+        color: #c0392b;
+        background: #fdecea;
+        padding: 12px 15px;
+        border-radius: 10px;
+        margin-top: 20px;
+    }
+
+    .error-message.visible {
+        display: block;
+    }
+
+    .note {
+        color: #666;
+        font-size: 0.95em;
+        margin-top: 10px;
+    }
+
+    @media (max-width: 768px) {
+        body {
+            padding: 10px;
+        }
+
+        .header {
+            padding: 30px 20px;
+        }
+
+        .form-content {
+            padding: 20px;
+        }
+
+        .header h1 {
+            font-size: 1.8em;
+        }
+
+        .button-group {
+            flex-direction: column;
+        }
+
+        .sector-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .question-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after {
+            animation: none !important;
+            transition: none !important;
+        }
+    }
+</style>
+</head>
+<body>
+<div class="container">
+    <header class="header">
+        <h1>Autoavaliação Senior-Friendly</h1>
+        <p>Diagnóstico da sua organização em 5 eixos — GoldAgeing</p>
+        <div class="progress-bar" role="progressbar" aria-label="Progresso do formulário" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+    </header>
+
+    <form class="form-content" id="assessmentForm" novalidate>
+
+        <!-- 1. Setor -->
+        <section class="section active" data-step="1">
+            <h2 class="section-title">🏢 Setor de atividade</h2>
+            <p class="section-subtitle">Escolha o setor que melhor descreve a sua organização.</p>
+            <div class="sector-grid" id="sectorGrid">
+                <div class="sector-card" tabindex="0" role="radio" aria-checked="false" data-sector="Comércio e retalho">
+                    <div class="sector-icon">🛍️</div><div class="sector-name">Comércio e retalho</div>
+                </div>
+                <div class="sector-card" tabindex="0" role="radio" aria-checked="false" data-sector="Turismo e hotelaria">
+                    <div class="sector-icon">🏨</div><div class="sector-name">Turismo e hotelaria</div>
+                </div>
+                <div class="sector-card" tabindex="0" role="radio" aria-checked="false" data-sector="Saúde e bem-estar">
+                    <div class="sector-icon">🩺</div><div class="sector-name">Saúde e bem-estar</div>
+                </div>
+                <div class="sector-card" tabindex="0" role="radio" aria-checked="false" data-sector="Município / setor público">
+                    <div class="sector-icon">🏛️</div><div class="sector-name">Município / setor público</div>
+                </div>
+                <div class="sector-card" tabindex="0" role="radio" aria-checked="false" data-sector="Serviços">
+                    <div class="sector-icon">💼</div><div class="sector-name">Serviços</div>
+                </div>
+                <div class="sector-card" tabindex="0" role="radio" aria-checked="false" data-sector="IPSS / economia social">
+                    <div class="sector-icon">🤝</div><div class="sector-name">IPSS / economia social</div>
+                </div>
+            </div>
+            <input type="hidden" name="setor" id="sectorInput">
+            <div class="error-message" role="alert">Selecione um setor para continuar.</div>
+            <div class="button-group">
+                <button type="button" class="btn-primary" data-next>Seguinte →</button>
+            </div>
+        </section>
+
+        <!-- 2. Identificação -->
+        <section class="section" data-step="2">
+            <h2 class="section-title">📋 Identificação</h2>
+            <p class="section-subtitle">Dados da organização e da pessoa de contacto.</p>
+            <div class="form-group">
+                <label for="org">Nome da organização *</label>
+                <input type="text" id="org" name="organizacao" required>
+            </div>
+            <div class="form-group">
+                <label for="nif">NIF</label>
+                <input type="text" id="nif" name="nif" inputmode="numeric" pattern="[0-9]{9}" title="9 algarismos">
+            </div>
+            <div class="form-group">
+                <label for="municipio">Município *</label>
+                <input type="text" id="municipio" name="municipio" required placeholder="Ex.: Santarém">
+            </div>
+            <div class="form-group">
+                <label for="dimensao">Dimensão *</label>
+                <select id="dimensao" name="dimensao" required>
+                    <option value="">Selecione…</option>
+                    <option>Microempresa (menos de 10 pessoas)</option>
+                    <option>Pequena empresa (10–49)</option>
+                    <option>Média empresa (50–249)</option>
+                    <option>Grande empresa (250 ou mais)</option>
+                    <option>Entidade pública</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="contacto">Pessoa de contacto *</label>
+                <input type="text" id="contacto" name="contacto" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Email *</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            <div class="form-group">
+                <label for="telefone">Telefone</label>
+                <input type="tel" id="telefone" name="telefone">
+            </div>
+            <div class="form-group">
+                <label for="website">Website</label>
+                <input type="text" id="website" name="website" inputmode="url" autocomplete="url" placeholder="www.exemplo.pt">
+            </div>
+            <div class="error-message" role="alert">Preencha corretamente os campos obrigatórios (*).</div>
+            <div class="button-group">
+                <button type="button" class="btn-secondary" data-prev>← Anterior</button>
+                <button type="button" class="btn-primary" data-next>Seguinte →</button>
+            </div>
+        </section>
+
+        <!-- 3. Avaliação por eixos (gerada a partir de EIXOS) -->
+        <section class="section" data-step="3">
+            <h2 class="section-title">⭐ Avaliação por eixos</h2>
+            <p class="section-subtitle">Responda com base na situação atual, não na situação planeada.</p>
+            <div id="eixosContainer"></div>
+            <div class="error-message" role="alert">Responda a todas as perguntas para continuar.</div>
+            <div class="button-group">
+                <button type="button" class="btn-secondary" data-prev>← Anterior</button>
+                <button type="button" class="btn-primary" data-next>Seguinte →</button>
+            </div>
+        </section>
+
+        <!-- 4. Evidências -->
+        <section class="section" data-step="4">
+            <h2 class="section-title">📎 Evidências</h2>
+            <p class="section-subtitle">Anexe documentos que sustentem as respostas (opcional nesta fase).</p>
+            <div class="form-group">
+                <div class="file-upload" id="fileUpload" tabindex="0" role="button" aria-label="Anexar ficheiros">
+                    <div class="file-upload-icon">📁</div>
+                    <p><strong>Clique ou arraste ficheiros para aqui</strong></p>
+                    <p class="note">PDF, JPG ou PNG, até 10 MB por ficheiro</p>
+                    <input type="file" id="fileInput" name="evidencias" multiple accept=".pdf,.jpg,.jpeg,.png">
+                </div>
+                <ul class="file-list" id="fileList"></ul>
+            </div>
+            <div class="form-group">
+                <label for="observacoes">Observações</label>
+                <textarea id="observacoes" name="observacoes" placeholder="Iniciativas em curso, contexto relevante, dúvidas…"></textarea>
+            </div>
+            <div class="button-group">
+                <button type="button" class="btn-secondary" data-prev>← Anterior</button>
+                <button type="button" class="btn-primary" data-next>Ver resultado →</button>
+            </div>
+        </section>
+
+        <!-- 5. Resultado -->
+        <section class="section" data-step="5">
+            <h2 class="section-title">🏅 Resultado</h2>
+            <p class="section-subtitle">Pontuação indicativa. A certificação exige validação por auditor GoldAgeing.</p>
+            <div class="score-display">
+                <div>Pontuação total</div>
+                <div class="score-number" id="scoreNumber">0</div>
+                <div>de <span id="scoreMax">0</span> pontos</div>
+                <div class="score-level" id="scoreLevel"></div>
+            </div>
+            <div class="summary-section" id="summaryEixos"></div>
+            <div class="summary-section" id="summaryOrg"></div>
+            <div class="button-group">
+                <button type="button" class="btn-secondary" data-prev>← Rever respostas</button>
+                <button type="submit" class="btn-success">Submeter avaliação ✓</button>
+            </div>
+        </section>
+    </form>
+</div>
+
+<script>
+// Pontuação por resposta: 0 = não existe, metade = parcial, total = implementado
+const EIXOS = [
+    { titulo: 'Eixo 1 — Acessibilidade física', perguntas: [
+        { id: 'e1q1', texto: 'O espaço tem acesso sem degraus (rampa ou elevador) e circulação livre de obstáculos?', pontos: 10 },
+        { id: 'e1q2', texto: 'Existem assentos de descanso, boa iluminação e sinalética em letra grande e contrastada?', pontos: 10 }
+    ]},
+    { titulo: 'Eixo 2 — Atendimento e comunicação', perguntas: [
+        { id: 'e2q1', texto: 'A equipa de atendimento recebeu formação sobre comunicação com pessoas 50+?', pontos: 10 },
+        { id: 'e2q2', texto: 'Existe atendimento presencial ou telefónico prioritário, sem depender só de canais digitais?', pontos: 10 }
+    ]},
+    { titulo: 'Eixo 3 — Produtos e serviços', perguntas: [
+        { id: 'e3q1', texto: 'A oferta inclui produtos ou serviços adaptados às necessidades de pessoas 50+?', pontos: 10 },
+        { id: 'e3q2', texto: 'Os preços, condições e contratos são apresentados de forma clara e legível?', pontos: 10 }
+    ]},
+    { titulo: 'Eixo 4 — Inclusão digital', perguntas: [
+        { id: 'e4q1', texto: 'O website ou a app cumpre as diretrizes de acessibilidade (WCAG 2.1 AA)?', pontos: 10 },
+        { id: 'e4q2', texto: 'É dado apoio a clientes com menor literacia digital (ex.: ajuda presencial, tutoriais)?', pontos: 10 }
+    ]},
+    { titulo: 'Eixo 5 — Pessoas e cultura organizacional', perguntas: [
+        { id: 'e5q1', texto: 'Existem práticas de recrutamento e retenção sem discriminação por idade?', pontos: 10 },
+        { id: 'e5q2', texto: 'A organização recolhe e usa o feedback de clientes 50+ para melhorar?', pontos: 10 }
+    ]}
+];
+
+const NIVEIS = [
+    { min: 80, nome: '🥇 Nível Ouro — pronto para certificação' },
+    { min: 60, nome: '🥈 Nível Prata — boas práticas consolidadas' },
+    { min: 40, nome: '🥉 Nível Bronze — em desenvolvimento' },
+    { min: 0,  nome: '🌱 Nível Inicial — plano de ação recomendado' }
+];
+
+const form = document.getElementById('assessmentForm');
+const sections = [...form.querySelectorAll('.section')];
+const progressFill = document.getElementById('progressFill');
+const progressBar = progressFill.parentElement;
+let current = 0;
+
+// Render dos eixos
+const eixosContainer = document.getElementById('eixosContainer');
+EIXOS.forEach(eixo => {
+    const h3 = document.createElement('h3');
+    h3.className = 'eixo-title';
+    h3.textContent = eixo.titulo;
+    eixosContainer.appendChild(h3);
+
+    eixo.perguntas.forEach(p => {
+        const opcoes = [
+            { valor: 0, texto: 'Não existe' },
+            { valor: p.pontos / 2, texto: 'Parcialmente implementado' },
+            { valor: p.pontos, texto: 'Totalmente implementado' }
+        ];
+        const card = document.createElement('div');
+        card.className = 'question-card';
+        card.setAttribute('role', 'radiogroup');
+        card.setAttribute('aria-labelledby', p.id + '-label');
+        card.innerHTML = `
+            <div class="question-header">
+                <label id="${p.id}-label">${p.texto}</label>
+                <span class="question-points">${p.pontos} pts</span>
+            </div>
+            <div class="radio-group">
+                ${opcoes.map(o => `
+                    <label class="radio-option">
+                        <input type="radio" name="${p.id}" value="${o.valor}" required>
+                        ${o.texto} (${o.valor} pts)
+                    </label>`).join('')}
+            </div>`;
+        eixosContainer.appendChild(card);
+    });
+});
+
+// Estado visual das opções
+form.addEventListener('change', e => {
+    if (e.target.type === 'radio') {
+        form.querySelectorAll(`input[name="${e.target.name}"]`).forEach(r =>
+            r.closest('.radio-option').classList.toggle('selected', r.checked));
+    }
+});
+
+// Seleção de setor
+const sectorInput = document.getElementById('sectorInput');
+const sectorCards = [...document.querySelectorAll('.sector-card')];
+function selectSector(card) {
+    sectorCards.forEach(c => {
+        c.classList.toggle('selected', c === card);
+        c.setAttribute('aria-checked', c === card);
+    });
+    sectorInput.value = card.dataset.sector;
+}
+sectorCards.forEach(card => {
+    card.addEventListener('click', () => selectSector(card));
+    card.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectSector(card); }
+    });
+});
+
+// Upload de ficheiros
+const fileUpload = document.getElementById('fileUpload');
+const fileInput = document.getElementById('fileInput');
+const fileList = document.getElementById('fileList');
+const MAX_BYTES = 10 * 1024 * 1024;
+function renderFiles(files) {
+    fileList.innerHTML = '';
+    [...files].forEach(f => {
+        const li = document.createElement('li');
+        const mb = (f.size / 1024 / 1024).toFixed(1);
+        li.textContent = `${f.size > MAX_BYTES ? '⚠️' : '📄'} ${f.name} (${mb} MB)${f.size > MAX_BYTES ? ' — excede 10 MB' : ''}`;
+        fileList.appendChild(li);
+    });
+}
+fileUpload.addEventListener('click', () => fileInput.click());
+fileUpload.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fileInput.click(); }
+});
+fileInput.addEventListener('change', () => renderFiles(fileInput.files));
+['dragenter', 'dragover'].forEach(ev => fileUpload.addEventListener(ev, e => {
+    e.preventDefault(); fileUpload.classList.add('dragover');
+}));
+['dragleave', 'drop'].forEach(ev => fileUpload.addEventListener(ev, e => {
+    e.preventDefault(); fileUpload.classList.remove('dragover');
+}));
+fileUpload.addEventListener('drop', e => {
+    fileInput.files = e.dataTransfer.files;
+    renderFiles(fileInput.files);
+});
+
+// Validação por secção
+function fieldName(el) {
+    const l = form.querySelector(`label[for="${el.id}"]`);
+    return l ? l.textContent.replace('*', '').trim() : el.name;
+}
+function validate(section) {
+    let ok = true;
+    const bad = [];
+    if (section.dataset.step === '1') ok = !!sectorInput.value;
+    section.querySelectorAll('input:not([type=hidden]):not([type=file]), select, textarea').forEach(el => {
+        if (el.type === 'radio') {
+            if (el.required && !form.querySelector(`input[name="${el.name}"]:checked`)) ok = false;
+            return;
+        }
+        el.value = el.value.trim();
+        const valid = el.checkValidity();
+        el.classList.toggle('invalid', !valid);
+        if (!valid) { ok = false; bad.push(el); }
+    });
+    const err = section.querySelector('.error-message');
+    if (err) {
+        if (!err.dataset.base) err.dataset.base = err.textContent;
+        err.textContent = bad.length
+            ? 'Verifique: ' + bad.map(fieldName).join(', ') + '.'
+            : err.dataset.base;
+        err.classList.toggle('visible', !ok);
+    }
+    if (bad.length) bad[0].focus();
+    return ok;
+}
+form.addEventListener('input', e => {
+    if (e.target.classList.contains('invalid') && e.target.checkValidity()) e.target.classList.remove('invalid');
+});
+
+// Cálculo e resumo
+function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+function computeScore() {
+    let total = 0, max = 0;
+    const porEixo = EIXOS.map(eixo => {
+        let s = 0, m = 0;
+        eixo.perguntas.forEach(p => {
+            const r = form.querySelector(`input[name="${p.id}"]:checked`);
+            s += r ? Number(r.value) : 0;
+            m += p.pontos;
+        });
+        total += s; max += m;
+        return { titulo: eixo.titulo, s, m };
+    });
+    const pct = max ? Math.round(total / max * 100) : 0;
+    const nivel = NIVEIS.find(n => pct >= n.min).nome;
+    return { total, max, pct, nivel, porEixo };
+}
+function renderSummary() {
+    const r = computeScore();
+    document.getElementById('scoreNumber').textContent = r.total;
+    document.getElementById('scoreMax').textContent = r.max;
+    document.getElementById('scoreLevel').textContent = r.nivel;
+    document.getElementById('summaryEixos').innerHTML = r.porEixo.map(e =>
+        `<div class="summary-item"><span>${escapeHtml(e.titulo)}</span><strong>${e.s} / ${e.m}</strong></div>`).join('');
+    const data = new FormData(form);
+    const linhas = [
+        ['Setor', data.get('setor')],
+        ['Organização', data.get('organizacao')],
+        ['Município', data.get('municipio')],
+        ['Dimensão', data.get('dimensao')],
+        ['Contacto', data.get('contacto')],
+        ['Email', data.get('email')],
+        ['Evidências anexadas', fileInput.files.length]
+    ];
+    document.getElementById('summaryOrg').innerHTML = linhas.map(([k, v]) =>
+        `<div class="summary-item"><span>${k}</span><strong>${escapeHtml(v === null || v === '' ? '—' : v)}</strong></div>`).join('');
+}
+
+// Navegação
+function showStep(i) {
+    sections[current].classList.remove('active');
+    current = i;
+    sections[current].classList.add('active');
+    const pct = Math.round(current / (sections.length - 1) * 100);
+    progressFill.style.width = pct + '%';
+    progressBar.setAttribute('aria-valuenow', pct);
+    if (current === sections.length - 1) renderSummary();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+form.addEventListener('click', e => {
+    if (e.target.matches('[data-next]') && validate(sections[current])) showStep(current + 1);
+    if (e.target.matches('[data-prev]')) showStep(current - 1);
+});
+
+// Submissão: sem backend, exporta as respostas em JSON
+form.addEventListener('submit', e => {
+    e.preventDefault();
+    const data = Object.fromEntries([...new FormData(form)].filter(([k]) => k !== 'evidencias'));
+    data.evidencias = [...fileInput.files].map(f => f.name);
+    data.resultado = computeScore();
+    data.data = new Date().toISOString();
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `autoavaliacao-senior-friendly-${(data.organizacao || 'organizacao').replace(/\W+/g, '-').toLowerCase()}.json`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+    alert('Avaliação submetida. O ficheiro com as respostas foi descarregado.');
+});
+</script>
+</body>
+</html>
