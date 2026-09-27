@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>GoldAgeing — Painel Administrativo</title>
+<style>
+    :root {
+        --gold: #b8860b;
+        --gold-light: #f5e6c4;
+        --gold-dark: #8a6508;
+        --text: #2b2b2b;
+        --muted: #666;
+        --bg: #faf7f0;
+        --card: #ffffff;
+        --border: #e6dcc6;
+        --ok: #2e7d32;
+        --ok-bg: #e8f5e9;
+        --pending: #b26a00;
+        --pending-bg: #fff3e0;
+        --info: #1565c0;
+        --info-bg: #e3f2fd;
+        --error: #c62828;
+        --error-bg: #ffebee;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+        font-size: 17px;
+        line-height: 1.6;
+        color: var(--text);
+        background: var(--bg);
+        min-height: 100vh;
+    }
+
+    .hidden { display: none !important; }
+
+    /* ---------- Login ---------- */
+    .login-wrap {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px 16px;
+    }
+    .login-card {
+        width: 100%;
+        max-width: 420px;
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+    }
+    .login-card .header { text-align: center; }
+    .login-body { padding: 24px; }
+
+    .header {
+        background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+        color: #fff;
+        padding: 24px;
+    }
+    .header h1 { font-size: 1.5rem; margin-bottom: 4px; }
+    .header p { opacity: 0.9; }
+
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; font-weight: 600; margin-bottom: 6px; }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        width: 100%;
+        padding: 12px;
+        font-size: 1rem;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        font-family: inherit;
+        background: #fff;
+    }
+    .form-group textarea { min-height: 90px; resize: vertical; }
+    input:focus, select:focus, textarea:focus { outline: 3px solid var(--gold-light); border-color: var(--gold); }
+
+    .alert { padding: 12px 16px; border-radius: 8px; margin-bottom: 16px; font-size: 0.95rem; }
+    .alert-error { background: var(--error-bg); color: var(--error); }
+    .alert-warning { background: var(--pending-bg); color: var(--pending); }
+    .alert a { color: inherit; font-weight: 700; }
+
+    .btn {
+        padding: 12px 20px;
+        font-size: 1rem;
+        font-weight: 600;
+        border-radius: 8px;
+        cursor: pointer;
+        border: 2px solid var(--gold);
+        min-height: 48px;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+    }
+    .btn-block { width: 100%; }
+    .btn-primary { background: var(--gold); color: #fff; }
+    .btn-primary:hover { background: var(--gold-dark); border-color: var(--gold-dark); }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-secondary { background: #fff; color: var(--gold-dark); }
+    .btn-secondary:hover { background: var(--gold-light); }
+    .btn-danger { background: #fff; color: var(--error); border-color: var(--error); }
+    .btn-danger:hover { background: var(--error-bg); }
+    .btn-sm { padding: 6px 12px; min-height: 36px; font-size: 0.9rem; }
+
+    .login-footer { text-align: center; margin-top: 16px; font-size: 0.9rem; color: var(--muted); }
+    .login-footer a { color: var(--gold-dark); }
+
+    /* ---------- Dashboard ---------- */
+    .topbar {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+    }
+    .topbar-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+    .topbar-actions .btn { background: rgba(255, 255, 255, 0.15); color: #fff; border-color: rgba(255, 255, 255, 0.6); }
+    .topbar-actions .btn:hover { background: rgba(255, 255, 255, 0.3); }
+
+    .main { max-width: 1200px; margin: 0 auto; padding: 24px 16px; }
+
+    .stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 12px;
+        margin-bottom: 24px;
+    }
+    .stat {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 16px;
+        cursor: pointer;
+        text-align: left;
+        font: inherit;
+        color: inherit;
+    }
+    .stat:hover, .stat.active { border-color: var(--gold); box-shadow: 0 0 0 2px var(--gold-light); }
+    .stat .value { font-size: 1.8rem; font-weight: 700; color: var(--gold-dark); }
+    .stat .label { color: var(--muted); font-size: 0.9rem; }
+
+    .toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 16px;
+        align-items: center;
+    }
+    .toolbar input, .toolbar select {
+        padding: 10px 12px;
+        font-size: 1rem;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background: #fff;
+    }
+    .toolbar input { flex: 1 1 260px; }
+
+    .panel {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        overflow-x: auto;
+    }
+    table { width: 100%; border-collapse: collapse; min-width: 720px; }
+    th, td { padding: 12px 14px; text-align: left; border-bottom: 1px solid var(--border); vertical-align: top; }
+    th { background: var(--gold-light); color: var(--gold-dark); font-size: 0.9rem; white-space: nowrap; }
+    tbody tr:hover { background: #fffbf2; }
+    tbody tr:last-child td { border-bottom: none; }
+    td small { color: var(--muted); display: block; }
+
+    .empty { padding: 40px 16px; text-align: center; color: var(--muted); }
+
+    .badge {
+        display: inline-block;
+        padding: 2px 10px;
+        border-radius: 999px;
+        font-size: 0.8rem;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+    .badge-nova { background: var(--info-bg); color: var(--info); }
+    .badge-em_analise { background: var(--pending-bg); color: var(--pending); }
+    .badge-aprovada { background: var(--ok-bg); color: var(--ok); }
+    .badge-rejeitada { background: var(--error-bg); color: var(--error); }
+
+    .source-note { color: var(--muted); font-size: 0.9rem; margin-top: 12px; }
+
+    /* ---------- Modal ---------- */
+    .modal-backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.45);
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        padding: 24px 16px;
+        overflow-y: auto;
+        z-index: 10;
+    }
+    .modal {
+        width: 100%;
+        max-width: 720px;
+        background: var(--card);
+        border-radius: 12px;
+        overflow: hidden;
+    }
+    .modal .header { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+    .modal .header h2 { font-size: 1.25rem; }
+    .modal-close { background: none; border: none; color: #fff; font-size: 1.6rem; cursor: pointer; line-height: 1; padding: 4px 8px; }
+    .modal-body { padding: 24px; }
+
+    dl.details { display: grid; grid-template-columns: minmax(120px, 200px) 1fr; gap: 8px 16px; margin-bottom: 24px; }
+    dl.details dt { font-weight: 600; color: var(--gold-dark); word-break: break-word; }
+    dl.details dd { word-break: break-word; white-space: pre-wrap; }
+
+    .modal-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+
+    @media (max-width: 560px) {
+        dl.details { grid-template-columns: 1fr; gap: 2px; }
+        dl.details dd { margin-bottom: 10px; }
+    }
+</style>
+</head>
+<body>
+
+<!-- ================= LOGIN ================= -->
+<div class="login-wrap" id="loginView">
+    <div class="login-card">
+        <div class="header">
+            <h1>🔐 GoldAgeing</h1>
+            <p>Painel Administrativo</p>
+        </div>
+        <div class="login-body">
+            <div class="alert alert-warning hidden" id="notConfigured">
+                ⚠️ O sistema ainda não tem um administrador configurado.
+                <a href="goldageing-config.html">Configurar agora →</a>
+            </div>
+            <div class="alert alert-error hidden" id="loginError" role="alert"></div>
+
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label for="username">Nome de utilizador</label>
+                    <input type="text" id="username" autocomplete="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" autocomplete="current-password" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block" id="loginButton">Entrar</button>
+            </form>
+
+            <div class="login-footer">
+                <a href="goldageing-config.html">⚙️ Configuração</a> ·
+                <a href="goldageing-formulario-completo.html">📋 Formulário</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ================= DASHBOARD ================= -->
+<div class="hidden" id="dashboardView">
+    <div class="header">
+        <div class="topbar">
+            <div>
+                <h1>📋 Candidaturas GoldAgeing</h1>
+                <p id="welcomeText"></p>
+            </div>
+            <div class="topbar-actions">
+                <button class="btn btn-sm" onclick="loadSubmissions()">🔄 Atualizar</button>
+                <button class="btn btn-sm" onclick="exportCSV()">📊 Exportar CSV</button>
+                <a class="btn btn-sm" href="goldageing-config.html">⚙️ Configuração</a>
+                <button class="btn btn-sm" onclick="logout()">🚪 Sair</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="main">
+        <div class="stats" id="stats"></div>
+
+        <div class="toolbar">
+            <input type="search" id="searchInput" placeholder="🔍 Pesquisar por nome, email, entidade…" oninput="renderTable()" aria-label="Pesquisar candidaturas">
+            <select id="statusFilter" onchange="setStatusFilter(this.value)" aria-label="Filtrar por estado">
+                <option value="">Todos os estados</option>
+            </select>
+        </div>
+
+        <div class="panel">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Candidato</th>
+                        <th>Contacto</th>
+                        <th>Entidade / Tipo</th>
+                        <th>Estado</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody id="submissionsBody"></tbody>
+            </table>
+            <div class="empty hidden" id="emptyState">Nenhuma candidatura encontrada.</div>
+        </div>
+        <p class="source-note" id="sourceNote"></p>
+    </div>
+</div>
+
+<!-- ================= MODAL DETALHE ================= -->
+<div class="modal-backdrop hidden" id="detailModal" onclick="if (event.target === this) closeDetail()">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="detailTitle">
+        <div class="header">
+            <h2 id="detailTitle">Candidatura</h2>
+            <button class="modal-close" onclick="closeDetail()" aria-label="Fechar">×</button>
+        </div>
+        <div class="modal-body">
+            <dl class="details" id="detailList"></dl>
+
+            <div class="form-group">
+                <label for="detailStatus">Estado</label>
+                <select id="detailStatus"></select>
+            </div>
+            <div class="form-group">
+                <label for="detailNotes">Notas internas</label>
+                <textarea id="detailNotes" placeholder="Visíveis apenas para a equipa GoldAgeing"></textarea>
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn btn-primary" onclick="saveDetail()">💾 Guardar</button>
+                <a class="btn btn-secondary hidden" id="detailWhatsapp" target="_blank" rel="noopener">💬 WhatsApp</a>
+                <a class="btn btn-secondary hidden" id="detailEmail">✉️ Email</a>
+                <button class="btn btn-danger" onclick="deleteSubmission()">🗑️ Apagar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const CONFIG_KEY = 'goldageing_config';
+    const SUBMISSIONS_KEY = 'goldageing_submissions';
+    const SESSION_KEY = 'goldageing_admin_session';
+    const LOCKOUT_KEY = 'goldageing_login_lockout';
+
+    const SESSION_DURATION_MS = 30 * 60 * 1000;   // 30 minutos de inatividade
+    const MAX_ATTEMPTS = 5;
+    const LOCKOUT_MS = 5 * 60 * 1000;             // 5 minutos de bloqueio
+
+    const STATUSES = {
+        nova: 'Nova',
+        em_analise: 'Em análise',
+        aprovada: 'Aprovada',
+        rejeitada: 'Rejeitada'
+    };
+
+    // Nomes de campo aceites para cada coluna (o formulário pode usar PT ou EN)
+    const FIELD_ALIASES = {
+        name: ['nome', 'nomeCompleto', 'name', 'fullName', 'responsavel'],
+        email: ['email', 'mail'],
+        phone: ['telefone', 'telemovel', 'phone', 'whatsapp', 'contacto'],
+        entity: ['entidade', 'organizacao', 'empresa', 'municipio', 'organization', 'company'],
+        type: ['tipo', 'tipoCandidatura', 'categoria', 'type', 'perfil'],
+        date: ['submittedAt', 'createdAt', 'dataSubmissao', 'data', 'timestamp']
+    };
+
+    const INTERNAL_FIELDS = ['id', 'status', 'adminNotes', 'updatedAt'];
+
+    let config = {};
+    let submissions = [];
+    let currentId = null;
+
+    // ---------- Utilitários ----------
+
+    function readJSON(storage, key, fallback) {
+        try {
+            const raw = storage.getItem(key);
+            return raw ? JSON.parse(raw) : fallback;
+        } catch (e) {
+            return fallback;
+        }
+    }
+
+    function escapeHTML(value) {
+        return String(value ?? '').replace(/[&<>"']/g, c => ({
+            '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+        })[c]);
+    }
+
+    function pick(obj, field) {
+        for (const key of FIELD_ALIASES[field]) {
+            if (obj[key] !== undefined && obj[key] !== null && obj[key] !== '') return obj[key];
+        }
+        return '';
+    }
+
+    function formatDate(value) {
+        if (!value) return '—';
+        const d = new Date(value);
+        if (isNaN(d)) return String(value);
+        return d.toLocaleDateString('pt-PT') + ' ' + d.toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' });
+    }
+
+    function formatValue(value) {
+        if (Array.isArray(value)) return value.join(', ');
+        if (value && typeof value === 'object') return JSON.stringify(value, null, 2);
+        if (typeof value === 'boolean') return value ? 'Sim' : 'Não';
+        return String(value ?? '');
+    }
+
+    function humanizeKey(key) {
+        return key
+            .replace(/([a-z])([A-Z])/g, '$1 $2')
+            .replace(/[_-]+/g, ' ')
+            .replace(/^./, c => c.toUpperCase());
+    }
+
+    function statusOf(sub) {
+        return STATUSES[sub.status] ? sub.status : 'nova';
+    }
+
+    function isFirebase() {
+        return config.mode === 'firebase' && config.firebase && config.firebase.databaseURL;
+    }
+
+    async function hashPassword(password) {
+        const data = new TextEncoder().encode(password);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+        return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    // Comparação em tempo constante para não revelar prefixos do hash
+    function safeEqual(a, b) {
+        if (a.length !== b.length) return false;
+        let diff = 0;
+        for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
+        return diff === 0;
+    }
+
+    // ---------- Autenticação ----------
+
+    function showLoginError(message) {
+        const el = document.getElementById('loginError');
+        el.textContent = message;
+        el.classList.remove('hidden');
+    }
+
+    function getLockout() {
+        return readJSON(localStorage, LOCKOUT_KEY, { attempts: 0, until: 0 });
+    }
+
+    async function handleLogin(event) {
+        event.preventDefault();
+        document.getElementById('loginError').classList.add('hidden');
+
+        const lockout = getLockout();
+        if (lockout.until > Date.now()) {
+            const minutes = Math.ceil((lockout.until - Date.now()) / 60000);
+            showLoginError(`🔒 Demasiadas tentativas falhadas. Tente novamente dentro de ${minutes} minuto(s).`);
+            return;
+        }
+
+        const username = document.getElementById('username').value.trim();
+        const password = document.getElementById('password').value;
+        const passwordHash = await hashPassword(password);
+
+        const valid = config.admin
+            && username === config.admin.username
+            && safeEqual(passwordHash, config.admin.passwordHash || '');
+
+        if (!valid) {
+            const attempts = lockout.attempts + 1;
+            if (attempts >= MAX_ATTEMPTS) {
+                localStorage.setItem(LOCKOUT_KEY, JSON.stringify({ attempts: 0, until: Date.now() + LOCKOUT_MS }));
+                showLoginError('🔒 Demasiadas tentativas falhadas. Acesso bloqueado durante 5 minutos.');
+            } else {
+                localStorage.setItem(LOCKOUT_KEY, JSON.stringify({ attempts, until: 0 }));
+                showLoginError(`❌ Credenciais inválidas. Restam ${MAX_ATTEMPTS - attempts} tentativa(s).`);
+            }
+            document.getElementById('password').value = '';
+            return;
+        }
+
+        localStorage.removeItem(LOCKOUT_KEY);
+        sessionStorage.setItem(SESSION_KEY, JSON.stringify({
+            username,
+            expiresAt: Date.now() + SESSION_DURATION_MS
+        }));
+        document.getElementById('password').value = '';
+        showDashboard();
+    }
+
+    function getSession() {
+        const session = readJSON(sessionStorage, SESSION_KEY, null);
+        if (!session || session.expiresAt < Date.now() || !config.admin || session.username !== config.admin.username) {
+            sessionStorage.removeItem(SESSION_KEY);
+            return null;
+        }
+        return session;
+    }
+
+    // Prolonga a sessão enquanto o administrador estiver ativo
+    function touchSession() {
+        const session = getSession();
+        if (!session) return;
+        session.expiresAt = Date.now() + SESSION_DURATION_MS;
+        sessionStorage.setItem(SESSION_KEY, JSON.stringify(session));
+    }
+
+    function logout(message) {
+        sessionStorage.removeItem(SESSION_KEY);
+        closeDetail();
+        submissions = [];
+        document.getElementById('dashboardView').classList.add('hidden');
+        document.getElementById('loginView').classList.remove('hidden');
+        if (message) showLoginError(message);
+    }
+
+    function requireSession() {
+        if (getSession()) {
+            touchSession();
+            return true;
+        }
+        logout('⏱️ A sessão expirou. Entre novamente.');
+        return false;
+    }
+
+    // ---------- Dados ----------
+
+    async function loadSubmissions() {
+        if (!requireSession()) return;
+
+        if (isFirebase()) {
+            try {
+                const response = await fetch(`${config.firebase.databaseURL}/submissions.json`);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const data = await response.json() || {};
+                submissions = Object.entries(data).map(([id, sub]) => ({ ...sub, id }));
+                document.getElementById('sourceNote').textContent = `🔥 Dados carregados do Firebase (${config.firebase.projectId}).`;
+            } catch (e) {
+                submissions = [];
+                document.getElementById('sourceNote').textContent = `❌ Não foi possível carregar do Firebase: ${e.message}. Verifique a configuração e as regras de segurança.`;
+            }
+        } else {
+            const stored = readJSON(localStorage, SUBMISSIONS_KEY, []);
+            let changed = false;
+            submissions = (Array.isArray(stored) ? stored : []).map((sub, i) => {
+                if (!sub.id) {
+                    changed = true;
+                    return { ...sub, id: `local_${Date.now()}_${i}` };
+                }
+                return sub;
+            });
+            // Guardar IDs gerados para que editar/apagar funcione de forma estável
+            if (changed) saveLocal();
+            document.getElementById('sourceNote').textContent = '💾 Dados carregados deste navegador (modo local de testes).';
+        }
+
+        submissions.sort((a, b) => new Date(pick(b, 'date') || 0) - new Date(pick(a, 'date') || 0));
+        renderStats();
+        renderTable();
+    }
+
+    function saveLocal() {
+        localStorage.setItem(SUBMISSIONS_KEY, JSON.stringify(submissions));
+    }
+
+    async function persistUpdate(id, changes) {
+        if (isFirebase()) {
+            const response = await fetch(`${config.firebase.databaseURL}/submissions/${encodeURIComponent(id)}.json`, {
+                method: 'PATCH',
+                body: JSON.stringify(changes)
+            });
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        }
+        const sub = submissions.find(s => s.id === id);
+        Object.assign(sub, changes);
+        if (!isFirebase()) saveLocal();
+    }
+
+    async function persistDelete(id) {
+        if (isFirebase()) {
+            const response = await fetch(`${config.firebase.databaseURL}/submissions/${encodeURIComponent(id)}.json`, { method: 'DELETE' });
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        }
+        submissions = submissions.filter(s => s.id !== id);
+        if (!isFirebase()) saveLocal();
+    }
+
+    // ---------- Interface ----------
+
+    function showDashboard() {
+        document.getElementById('loginView').classList.add('hidden');
+        document.getElementById('dashboardView').classList.remove('hidden');
+        document.getElementById('welcomeText').textContent = `Sessão iniciada como ${getSession().username}`;
+        loadSubmissions();
+    }
+
+    function setStatusFilter(value) {
+        document.getElementById('statusFilter').value = value;
+        renderStats();
+        renderTable();
+    }
+
+    function renderStats() {
+        const active = document.getElementById('statusFilter').value;
+        const counts = { '': submissions.length };
+        Object.keys(STATUSES).forEach(s => { counts[s] = 0; });
+        submissions.forEach(sub => { counts[statusOf(sub)]++; });
+
+        const cards = [['', 'Total'], ...Object.entries(STATUSES)];
+        document.getElementById('stats').innerHTML = cards.map(([key, label]) => `
+            <button class="stat ${active === key ? 'active' : ''}" onclick="setStatusFilter('${key}')">
+                <div class="value">${counts[key]}</div>
+                <div class="label">${label}</div>
+            </button>
+        `).join('');
+    }
+
+    function filteredSubmissions() {
+        const query = document.getElementById('searchInput').value.trim().toLowerCase();
+        const status = document.getElementById('statusFilter').value;
+        return submissions.filter(sub => {
+            if (status && statusOf(sub) !== status) return false;
+            if (!query) return true;
+            return Object.entries(sub)
+                .filter(([k]) => k !== 'id')
+                .some(([, v]) => formatValue(v).toLowerCase().includes(query));
+        });
+    }
+
+    function renderTable() {
+        const rows = filteredSubmissions();
+        const body = document.getElementById('submissionsBody');
+        document.getElementById('emptyState').classList.toggle('hidden', rows.length > 0);
+
+        body.innerHTML = rows.map(sub => {
+            const status = statusOf(sub);
+            return `
+                <tr>
+                    <td>${escapeHTML(formatDate(pick(sub, 'date')))}</td>
+                    <td><strong>${escapeHTML(pick(sub, 'name') || '—')}</strong></td>
+                    <td>${escapeHTML(pick(sub, 'email') || '—')}<small>${escapeHTML(pick(sub, 'phone'))}</small></td>
+                    <td>${escapeHTML(pick(sub, 'entity') || '—')}<small>${escapeHTML(pick(sub, 'type'))}</small></td>
+                    <td><span class="badge badge-${status}">${STATUSES[status]}</span></td>
+                    <td><button class="btn btn-secondary btn-sm" data-id="${escapeHTML(sub.id)}" onclick="openDetail(this.dataset.id)">Ver</button></td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    function openDetail(id) {
+        if (!requireSession()) return;
+        const sub = submissions.find(s => s.id === id);
+        if (!sub) return;
+        currentId = id;
+
+        document.getElementById('detailTitle').textContent = pick(sub, 'name') || 'Candidatura';
+
+        document.getElementById('detailList').innerHTML = Object.entries(sub)
+            .filter(([key]) => !INTERNAL_FIELDS.includes(key))
+            .map(([key, value]) => `
+                <dt>${escapeHTML(humanizeKey(key))}</dt>
+                <dd>${escapeHTML(FIELD_ALIASES.date.includes(key) ? formatDate(value) : formatValue(value)) || '—'}</dd>
+            `).join('');
+
+        document.getElementById('detailStatus').value = statusOf(sub);
+        document.getElementById('detailNotes').value = sub.adminNotes || '';
+
+        const phone = String(pick(sub, 'phone')).replace(/\D/g, '');
+        const whatsapp = document.getElementById('detailWhatsapp');
+        if (phone) {
+            // Números portugueses de 9 dígitos recebem o indicativo 351
+            const full = phone.length === 9 ? `351${phone}` : phone;
+            whatsapp.href = `https://wa.me/${full}`;
+            whatsapp.classList.remove('hidden');
+        } else {
+            whatsapp.classList.add('hidden');
+        }
+
+        const email = pick(sub, 'email');
+        const emailLink = document.getElementById('detailEmail');
+        if (email) {
+            emailLink.href = `mailto:${encodeURIComponent(email)}?subject=${encodeURIComponent('A sua candidatura GoldAgeing')}`;
+            emailLink.classList.remove('hidden');
+        } else {
+            emailLink.classList.add('hidden');
+        }
+
+        document.getElementById('detailModal').classList.remove('hidden');
+    }
+
+    function closeDetail() {
+        currentId = null;
+        document.getElementById('detailModal').classList.add('hidden');
+    }
+
+    async function saveDetail() {
+        if (!requireSession() || !currentId) return;
+        try {
+            await persistUpdate(currentId, {
+                status: document.getElementById('detailStatus').value,
+                adminNotes: document.getElementById('detailNotes').value.trim(),
+                updatedAt: new Date().toISOString()
+            });
+            closeDetail();
+            renderStats();
+            renderTable();
+        } catch (e) {
+            alert('❌ Não foi possível guardar: ' + e.message);
+        }
+    }
+
+    async function deleteSubmission() {
+        if (!requireSession() || !currentId) return;
+        if (!confirm('⚠️ Apagar esta candidatura?\n\nEsta ação é irreversível.')) return;
+        try {
+            await persistDelete(currentId);
+            closeDetail();
+            renderStats();
+            renderTable();
+        } catch (e) {
+            alert('❌ Não foi possível apagar: ' + e.message);
+        }
+    }
+
+    function exportCSV() {
+        if (!requireSession()) return;
+        const rows = filteredSubmissions();
+        if (rows.length === 0) {
+            alert('Não há candidaturas para exportar.');
+            return;
+        }
+
+        const keys = [...new Set(rows.flatMap(Object.keys))];
+        // Evitar injeção de fórmulas ao abrir no Excel
+        const cell = value => {
+            let text = formatValue(value);
+            if (/^[=+\-@\t\r]/.test(text)) text = "'" + text;
+            return `"${text.replace(/"/g, '""')}"`;
+        };
+        const csv = [keys.map(cell).join(';'), ...rows.map(r => keys.map(k => cell(r[k])).join(';'))].join('\r\n');
+
+        // BOM para o Excel reconhecer UTF-8 (acentos)
+        const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `goldageing_candidaturas_${new Date().toISOString().split('T')[0]}.csv`;
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+
+    // ---------- Inicialização ----------
+
+    window.addEventListener('DOMContentLoaded', () => {
+        config = readJSON(localStorage, CONFIG_KEY, {});
+
+        const statusOptions = Object.entries(STATUSES).map(([k, v]) => `<option value="${k}">${v}</option>`).join('');
+        document.getElementById('statusFilter').insertAdjacentHTML('beforeend', statusOptions);
+        document.getElementById('detailStatus').innerHTML = statusOptions;
+
+        if (!config.admin) {
+            document.getElementById('notConfigured').classList.remove('hidden');
+            document.getElementById('loginButton').disabled = true;
+            return;
+        }
+
+        if (getSession()) showDashboard();
+
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDetail(); });
+        ['click', 'keydown'].forEach(evt => document.addEventListener(evt, () => {
+            if (!document.getElementById('dashboardView').classList.contains('hidden')) touchSession();
+        }));
+
+        // Verificar expiração periodicamente
+        setInterval(() => {
+            if (!document.getElementById('dashboardView').classList.contains('hidden') && !getSession()) {
+                logout('⏱️ A sessão expirou por inatividade. Entre novamente.');
+            }
+        }, 60 * 1000);
+    });
+</script>
+</body>
+</html>
