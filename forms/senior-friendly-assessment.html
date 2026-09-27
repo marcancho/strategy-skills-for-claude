@@ -378,6 +378,11 @@
         border-bottom: none;
     }
 
+    input.invalid,
+    select.invalid {
+        border-color: #d9534f;
+    }
+
     .error-message {
         display: none;
         color: #c0392b;
@@ -489,7 +494,7 @@
             </div>
             <div class="form-group">
                 <label for="nif">NIF</label>
-                <input type="text" id="nif" name="nif" inputmode="numeric" pattern="[0-9]{9}">
+                <input type="text" id="nif" name="nif" inputmode="numeric" pattern="[0-9]{9}" title="9 algarismos">
             </div>
             <div class="form-group">
                 <label for="municipio">Município *</label>
@@ -520,7 +525,7 @@
             </div>
             <div class="form-group">
                 <label for="website">Website</label>
-                <input type="url" id="website" name="website" placeholder="https://">
+                <input type="text" id="website" name="website" inputmode="url" autocomplete="url" placeholder="www.exemplo.pt">
             </div>
             <div class="error-message" role="alert">Preencha corretamente os campos obrigatórios (*).</div>
             <div class="button-group">
@@ -712,20 +717,38 @@ fileUpload.addEventListener('drop', e => {
 });
 
 // Validação por secção
+function fieldName(el) {
+    const l = form.querySelector(`label[for="${el.id}"]`);
+    return l ? l.textContent.replace('*', '').trim() : el.name;
+}
 function validate(section) {
     let ok = true;
+    const bad = [];
     if (section.dataset.step === '1') ok = !!sectorInput.value;
     section.querySelectorAll('input:not([type=hidden]):not([type=file]), select, textarea').forEach(el => {
         if (el.type === 'radio') {
             if (el.required && !form.querySelector(`input[name="${el.name}"]:checked`)) ok = false;
-        } else if (!el.checkValidity()) {
-            ok = false;
+            return;
         }
+        el.value = el.value.trim();
+        const valid = el.checkValidity();
+        el.classList.toggle('invalid', !valid);
+        if (!valid) { ok = false; bad.push(el); }
     });
     const err = section.querySelector('.error-message');
-    if (err) err.classList.toggle('visible', !ok);
+    if (err) {
+        if (!err.dataset.base) err.dataset.base = err.textContent;
+        err.textContent = bad.length
+            ? 'Verifique: ' + bad.map(fieldName).join(', ') + '.'
+            : err.dataset.base;
+        err.classList.toggle('visible', !ok);
+    }
+    if (bad.length) bad[0].focus();
     return ok;
 }
+form.addEventListener('input', e => {
+    if (e.target.classList.contains('invalid') && e.target.checkValidity()) e.target.classList.remove('invalid');
+});
 
 // Cálculo e resumo
 function escapeHtml(s) {
