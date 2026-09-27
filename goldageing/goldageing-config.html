@@ -211,10 +211,22 @@
                 <h3>📘 Como obter a configuração</h3>
                 <ol class="instructions">
                     <li>Aceda à consola do Firebase e crie (ou abra) o projeto GoldAgeing.</li>
-                    <li>Ative a <strong>Realtime Database</strong> e copie o URL da base de dados.</li>
+                    <li>Ative a <strong>Realtime Database</strong> (localização europeia, ex. <code>europe-west1</code>) e copie o URL da base de dados.</li>
                     <li>Em <em>Definições do projeto → As suas apps</em>, registe uma app Web.</li>
                     <li>Copie o objeto <code>firebaseConfig</code> e cole-o abaixo em formato JSON.</li>
                 </ol>
+            </div>
+
+            <div class="step">
+                <h3>🔐 Proteger os dados (obrigatório antes de receber candidaturas)</h3>
+                <ol class="instructions">
+                    <li>Em <em>Authentication → Sign-in method</em>, ative <strong>Email/Password</strong>.</li>
+                    <li>Em <em>Authentication → Users</em>, crie o utilizador administrador e copie o seu <strong>User UID</strong>.</li>
+                    <li>Em <em>Realtime Database → Dados</em>, crie o nó <code>admins</code> com a chave igual ao UID e o valor <code>true</code>.</li>
+                    <li>Em <em>Realtime Database → Regras</em>, cole o conteúdo do ficheiro <code>firebase-database.rules.json</code> e clique em <strong>Publicar</strong>.</li>
+                    <li>Guarde a configuração abaixo e use <strong>Testar Conexão</strong>: deve indicar que a base de dados está protegida.</li>
+                </ol>
+                <p style="margin-top: 10px;">Em modo Firebase, o painel administrativo pede o <strong>email e a password do Firebase</strong>; a password local deixa de ser usada.</p>
             </div>
 
             <div class="step">
@@ -237,7 +249,12 @@
             <div class="action-buttons">
                 <button class="btn btn-primary" onclick="saveFirebaseConfig()">🔥 Guardar Configuração Firebase</button>
                 <button class="btn btn-secondary" onclick="testFirebase()">🧪 Testar Conexão</button>
+                <button class="btn btn-secondary" onclick="copyPublishConfig()">📋 Copiar configuração para publicação</button>
             </div>
+            <p style="margin-top: 12px; color: var(--muted);">
+                Antes de publicar, substitua a linha <code>const EMBEDDED_CONFIG = null;</code> no formulário e no painel
+                pelo texto copiado. Sem isso, os visitantes não recebem a configuração e o formulário funciona em modo local.
+            </p>
         </div>
 
         <!-- TAB: STATUS -->
@@ -397,6 +414,8 @@
         updateStatus();
     }
 
+    // Testa a ligação sem escrever dados: uma leitura anónima de /submissions
+    // tem de ser recusada (401) se as regras de segurança estiverem publicadas.
     async function testFirebase() {
         const config = readJSON(CONFIG_KEY, {});
         if (!config.firebase) {
@@ -404,22 +423,43 @@
             return;
         }
 
-        const testUrl = `${config.firebase.databaseURL}/test.json`;
         try {
-            const response = await fetch(testUrl, {
-                method: 'PUT',
-                body: JSON.stringify({ test: true, timestamp: new Date().toISOString() })
-            });
+            const response = await fetch(`${config.firebase.databaseURL}/submissions.json?shallow=true`);
 
-            if (response.ok) {
-                // Limpar o registo de teste para não deixar lixo na base de dados
-                await fetch(testUrl, { method: 'DELETE' }).catch(() => {});
-                alert('✅ Conexão Firebase bem-sucedida!\n\nO sistema está pronto para usar.');
+            if (response.status === 401) {
+                alert('✅ Conexão Firebase bem-sucedida e base de dados protegida!\n\nO público não consegue ler as candidaturas.');
+            } else if (response.ok) {
+                alert('⚠️ Conexão bem-sucedida, mas a base de dados está ABERTA: qualquer pessoa pode ler as candidaturas.\n\nPublique as regras de firebase-database.rules.json antes de receber candidaturas.');
+            } else if (response.status === 404) {
+                alert('❌ Base de dados não encontrada (HTTP 404).\n\nVerifique o databaseURL.');
             } else {
-                alert(`❌ Erro ao conectar ao Firebase (HTTP ${response.status}).\n\nVerifique as regras de segurança e a URL da base de dados.`);
+                alert(`❌ Erro ao conectar ao Firebase (HTTP ${response.status}).\n\nVerifique o databaseURL.`);
             }
         } catch (e) {
             alert('❌ Erro de conexão: ' + e.message);
+        }
+    }
+
+    // Gera a linha EMBEDDED_CONFIG a colar nas páginas publicadas.
+    // Inclui apenas dados públicos: nunca o hash da password local.
+    async function copyPublishConfig() {
+        const config = readJSON(CONFIG_KEY, {});
+        if (!config.firebase) {
+            alert('❌ Configure e teste o Firebase primeiro: as páginas publicadas precisam do modo Firebase.');
+            return;
+        }
+        const publicConfig = {
+            mode: 'firebase',
+            firebase: config.firebase,
+            whatsapp: config.whatsapp || '',
+            email: config.email || ''
+        };
+        const line = `const EMBEDDED_CONFIG = ${JSON.stringify(publicConfig)};`;
+        try {
+            await navigator.clipboard.writeText(line);
+            alert('✅ Copiado! Cole no lugar de "const EMBEDDED_CONFIG = null;" no formulário e no painel.');
+        } catch (e) {
+            prompt('Copie este texto:', line);
         }
     }
 
@@ -437,8 +477,10 @@
             },
             {
                 label: 'Administrador',
-                status: config.admin ? 'ok' : 'pending',
-                detail: config.admin ? `✅ ${escapeHTML(config.admin.username)}` : '⏳ Pendente'
+                status: config.firebase || config.admin ? 'ok' : 'pending',
+                detail: config.firebase
+                    ? '🔐 Firebase Authentication (email/password)'
+                    : (config.admin ? `✅ ${escapeHTML(config.admin.username)}` : '⏳ Pendente')
             },
             {
                 label: 'WhatsApp',

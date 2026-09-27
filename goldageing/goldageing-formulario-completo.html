@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GoldAgeing — Formulário de Candidatura</title>
+<meta name="description" content="Candidatura aos serviços GoldAgeing: certificação Senior-Friendly, diagnóstico, formação e consultoria em Silver Economy.">
+<style>
+    :root {
+        --gold: #b8860b;
+        --gold-light: #f5e6c4;
+        --gold-dark: #8a6508;
+        --text: #2b2b2b;
+        --muted: #595959;
+        --bg: #faf7f0;
+        --card: #ffffff;
+        --border: #e6dcc6;
+        --ok: #2e7d32;
+        --ok-bg: #e8f5e9;
+        --error: #c62828;
+        --error-bg: #ffebee;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+        font-size: 18px;
+        line-height: 1.6;
+        color: var(--text);
+        background: var(--bg);
+        padding: 24px 16px;
+    }
+
+    .hidden { display: none !important; }
+
+    .container {
+        max-width: 780px;
+        margin: 0 auto;
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+    }
+
+    .header {
+        background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+        color: #fff;
+        padding: 28px 24px;
+    }
+    .header h1 { font-size: 1.7rem; margin-bottom: 6px; }
+    .header p { opacity: 0.95; }
+
+    /* ---------- Progresso ---------- */
+    .progress {
+        display: flex;
+        list-style: none;
+        border-bottom: 1px solid var(--border);
+        background: var(--gold-light);
+    }
+    .progress li {
+        flex: 1;
+        text-align: center;
+        padding: 12px 6px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--muted);
+        border-bottom: 4px solid transparent;
+    }
+    .progress li .num {
+        display: inline-flex;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        align-items: center;
+        justify-content: center;
+        background: #fff;
+        border: 2px solid var(--border);
+        margin-bottom: 4px;
+    }
+    .progress li.active { color: var(--gold-dark); border-bottom-color: var(--gold); }
+    .progress li.active .num { border-color: var(--gold); background: var(--gold); color: #fff; }
+    .progress li.done .num { border-color: var(--ok); background: var(--ok); color: #fff; }
+    .progress li .label { display: block; }
+
+    .content { padding: 28px 24px; }
+
+    .step h2 { color: var(--gold-dark); font-size: 1.3rem; margin-bottom: 6px; }
+    .step > p.intro { color: var(--muted); margin-bottom: 22px; }
+
+    .form-group { margin-bottom: 20px; }
+    .form-group > label, fieldset legend { display: block; font-weight: 600; margin-bottom: 6px; }
+    .req { color: var(--error); }
+    .hint { display: block; color: var(--muted); font-size: 0.9rem; margin-top: 4px; }
+
+    input[type="text"], input[type="email"], input[type="tel"], input[type="url"], select, textarea {
+        width: 100%;
+        padding: 14px;
+        font-size: 1.05rem;
+        border: 1px solid #cbbd9c;
+        border-radius: 8px;
+        font-family: inherit;
+        background: #fff;
+    }
+    textarea { min-height: 140px; resize: vertical; }
+    input:focus, select:focus, textarea:focus { outline: 3px solid var(--gold-light); border-color: var(--gold); }
+    .invalid { border-color: var(--error) !important; background: #fffafa; }
+
+    .field-error { color: var(--error); font-size: 0.9rem; margin-top: 4px; }
+
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0 16px; }
+
+    fieldset { border: none; margin-bottom: 20px; }
+    .options { display: grid; gap: 10px; }
+    .options.cols-2 { grid-template-columns: 1fr 1fr; }
+    .option {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 12px 14px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 400;
+    }
+    .option:hover { background: #fffbf2; }
+    .option input { width: 22px; height: 22px; margin-top: 3px; accent-color: var(--gold); flex-shrink: 0; }
+    .option:has(input:checked) { border-color: var(--gold); background: #fffbf2; }
+    .option small { display: block; color: var(--muted); font-size: 0.85rem; }
+
+    .consent {
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 16px;
+        font-size: 0.95rem;
+        margin-bottom: 16px;
+    }
+    .consent p { margin-bottom: 10px; color: var(--muted); }
+
+    .summary { border: 1px solid var(--border); border-radius: 8px; margin-bottom: 20px; }
+    .summary h3 {
+        background: var(--gold-light);
+        color: var(--gold-dark);
+        padding: 8px 14px;
+        font-size: 1rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .summary h3 button {
+        background: none;
+        border: none;
+        color: var(--gold-dark);
+        text-decoration: underline;
+        cursor: pointer;
+        font-size: 0.9rem;
+        font-weight: 600;
+    }
+    .summary dl { display: grid; grid-template-columns: minmax(120px, 190px) 1fr; gap: 6px 14px; padding: 12px 14px; font-size: 0.95rem; }
+    .summary dt { color: var(--muted); }
+    .summary dd { word-break: break-word; white-space: pre-wrap; }
+
+    .nav-buttons { display: flex; justify-content: space-between; gap: 12px; margin-top: 28px; flex-wrap: wrap; }
+
+    .btn {
+        padding: 14px 26px;
+        font-size: 1.05rem;
+        font-weight: 600;
+        border-radius: 8px;
+        cursor: pointer;
+        border: 2px solid var(--gold);
+        min-height: 52px;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+    .btn-primary { background: var(--gold); color: #fff; margin-left: auto; }
+    .btn-primary:hover { background: var(--gold-dark); border-color: var(--gold-dark); }
+    .btn-primary:disabled { opacity: 0.6; cursor: wait; }
+    .btn-secondary { background: #fff; color: var(--gold-dark); }
+    .btn-secondary:hover { background: var(--gold-light); }
+    .btn:focus-visible { outline: 3px solid var(--gold-dark); outline-offset: 2px; }
+
+    .alert { padding: 14px 16px; border-radius: 8px; margin-bottom: 18px; }
+    .alert-error { background: var(--error-bg); color: var(--error); }
+
+    /* Campo anti-spam invisível para pessoas */
+    .hp { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
+
+    .success { text-align: center; padding: 20px 0; }
+    .success .icon { font-size: 3.5rem; }
+    .success h2 { color: var(--ok); margin: 10px 0; font-size: 1.5rem; }
+    .success .ref {
+        display: inline-block;
+        background: var(--gold-light);
+        color: var(--gold-dark);
+        font-weight: 700;
+        padding: 8px 16px;
+        border-radius: 8px;
+        margin: 12px 0 20px;
+        font-family: ui-monospace, Menlo, Consolas, monospace;
+    }
+    .success p { color: var(--muted); margin-bottom: 12px; }
+    .success .actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 16px; }
+    .success .actions .btn-primary { margin-left: 0; }
+
+    .footer { text-align: center; color: var(--muted); font-size: 0.85rem; padding: 16px; }
+
+    @media (max-width: 600px) {
+        body { padding: 12px; }
+        .grid-2, .options.cols-2 { grid-template-columns: 1fr; }
+        .progress li .label { display: none; }
+        .summary dl { grid-template-columns: 1fr; gap: 0; }
+        .summary dd { margin-bottom: 8px; }
+        .nav-buttons .btn { flex: 1 1 100%; }
+        .btn-primary { margin-left: 0; }
+    }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>🌟 Candidatura GoldAgeing</h1>
+        <p>Certificação Senior-Friendly, diagnóstico, formação e consultoria em Silver Economy. Preencha em cerca de 5 minutos.</p>
+    </div>
+
+    <ol class="progress" id="progress" aria-label="Progresso da candidatura">
+        <li data-step="1"><span class="num">1</span><span class="label">Entidade</span></li>
+        <li data-step="2"><span class="num">2</span><span class="label">Responsável</span></li>
+        <li data-step="3"><span class="num">3</span><span class="label">Interesse</span></li>
+        <li data-step="4"><span class="num">4</span><span class="label">Confirmação</span></li>
+    </ol>
+
+    <div class="content">
+        <form id="applicationForm" novalidate onsubmit="event.preventDefault()">
+            <div class="alert alert-error hidden" id="formError" role="alert" tabindex="-1"></div>
+
+            <!-- Honeypot -->
+            <div class="hp" aria-hidden="true">
+                <label for="website_confirm">Não preencher</label>
+                <input type="text" id="website_confirm" name="website_confirm" tabindex="-1" autocomplete="off">
+            </div>
+
+            <!-- ============ PASSO 1: ENTIDADE ============ -->
+            <section class="step" data-step="1">
+                <h2>1. Sobre a entidade</h2>
+                <p class="intro">Indique a organização que se candidata.</p>
+
+                <fieldset>
+                    <legend>Tipo de entidade <span class="req">*</span></legend>
+                    <div class="options cols-2" id="tipoOptions">
+                        <label class="option"><input type="radio" name="tipo" value="Município / Junta de Freguesia" required> Município / Junta de Freguesia</label>
+                        <label class="option"><input type="radio" name="tipo" value="Empresa"> Empresa</label>
+                        <label class="option"><input type="radio" name="tipo" value="IPSS / Misericórdia / Associação"> IPSS / Misericórdia / Associação</label>
+                        <label class="option"><input type="radio" name="tipo" value="Hotelaria / Turismo"> Hotelaria / Turismo</label>
+                        <label class="option"><input type="radio" name="tipo" value="Saúde / Cuidados"> Saúde / Cuidados</label>
+                        <label class="option"><input type="radio" name="tipo" value="Universidade / Centro de Investigação"> Universidade / Investigação</label>
+                        <label class="option"><input type="radio" name="tipo" value="Startup / AgeTech"> Startup / AgeTech</label>
+                        <label class="option"><input type="radio" name="tipo" value="Outro"> Outro</label>
+                    </div>
+                </fieldset>
+
+                <div class="form-group">
+                    <label for="entidade">Nome da entidade <span class="req">*</span></label>
+                    <input type="text" id="entidade" name="entidade" required maxlength="160" autocomplete="organization">
+                </div>
+
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label for="nif">NIF / NIPC</label>
+                        <input type="text" id="nif" name="nif" inputmode="numeric" maxlength="9" placeholder="9 dígitos">
+                        <span class="hint">Opcional, mas acelera a análise.</span>
+                    </div>
+                    <div class="form-group">
+                        <label for="colaboradores">N.º de colaboradores</label>
+                        <select id="colaboradores" name="colaboradores">
+                            <option value="">Selecione…</option>
+                            <option>1–9</option>
+                            <option>10–49</option>
+                            <option>50–249</option>
+                            <option>250 ou mais</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label for="distrito">Distrito / Região <span class="req">*</span></label>
+                        <select id="distrito" name="distrito" required>
+                            <option value="">Selecione…</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="concelho">Concelho <span class="req">*</span></label>
+                        <input type="text" id="concelho" name="concelho" required maxlength="80" autocomplete="address-level2">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="website">Website</label>
+                    <input type="url" id="website" name="website" maxlength="300" placeholder="https://" autocomplete="url">
+                </div>
+            </section>
+
+            <!-- ============ PASSO 2: RESPONSÁVEL ============ -->
+            <section class="step hidden" data-step="2">
+                <h2>2. Pessoa de contacto</h2>
+                <p class="intro">Quem devemos contactar sobre esta candidatura?</p>
+
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label for="nome">Nome completo <span class="req">*</span></label>
+                        <input type="text" id="nome" name="nome" required maxlength="120" autocomplete="name">
+                    </div>
+                    <div class="form-group">
+                        <label for="cargo">Cargo / Função</label>
+                        <input type="text" id="cargo" name="cargo" maxlength="100" autocomplete="organization-title">
+                    </div>
+                </div>
+
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label for="email">Email <span class="req">*</span></label>
+                        <input type="email" id="email" name="email" required maxlength="160" autocomplete="email">
+                    </div>
+                    <div class="form-group">
+                        <label for="telefone">Telefone / Telemóvel <span class="req">*</span></label>
+                        <input type="tel" id="telefone" name="telefone" required maxlength="20" autocomplete="tel" placeholder="912 345 678">
+                    </div>
+                </div>
+
+                <fieldset>
+                    <legend>Como prefere ser contactado?</legend>
+                    <div class="options cols-2">
+                        <label class="option"><input type="radio" name="preferenciaContacto" value="Email" checked> ✉️ Email</label>
+                        <label class="option"><input type="radio" name="preferenciaContacto" value="Telefone"> 📞 Telefone</label>
+                        <label class="option"><input type="radio" name="preferenciaContacto" value="WhatsApp"> 💬 WhatsApp</label>
+                        <label class="option"><input type="radio" name="preferenciaContacto" value="Reunião presencial"> 🤝 Reunião presencial</label>
+                    </div>
+                </fieldset>
+            </section>
+
+            <!-- ============ PASSO 3: INTERESSE ============ -->
+            <section class="step hidden" data-step="3">
+                <h2>3. O que procura</h2>
+                <p class="intro">Ajude-nos a preparar a primeira conversa.</p>
+
+                <fieldset>
+                    <legend>Serviços de interesse <span class="req">*</span></legend>
+                    <div class="options" id="servicosOptions">
+                        <label class="option"><input type="checkbox" name="servicos" value="Certificação Senior-Friendly"><span>Certificação Senior-Friendly<small>Avaliação e selo para espaços, serviços e territórios</small></span></label>
+                        <label class="option"><input type="checkbox" name="servicos" value="Diagnóstico e plano estratégico"><span>Diagnóstico e plano estratégico<small>Análise demográfica, de mercado e roteiro de ação</small></span></label>
+                        <label class="option"><input type="checkbox" name="servicos" value="Formação e capacitação"><span>Formação e capacitação<small>Equipas, cuidadores, atendimento e combate ao idadismo</small></span></label>
+                        <label class="option"><input type="checkbox" name="servicos" value="Candidaturas a fundos europeus"><span>Candidaturas a fundos europeus<small>Portugal 2030, PRR, Interreg, Erasmus+ e outros</small></span></label>
+                        <label class="option"><input type="checkbox" name="servicos" value="Inovação social e AgeTech"><span>Inovação social e AgeTech<small>Novos serviços, pilotos e parcerias</small></span></label>
+                        <label class="option"><input type="checkbox" name="servicos" value="Revitalização territorial e comercial"><span>Revitalização territorial e comercial<small>Comércio local, turismo sénior e espaço público</small></span></label>
+                    </div>
+                </fieldset>
+
+                <fieldset>
+                    <legend>Público que pretende servir</legend>
+                    <div class="options cols-2">
+                        <label class="option"><input type="checkbox" name="publicoAlvo" value="Pessoas 50+ ativas"> Pessoas 50+ ativas</label>
+                        <label class="option"><input type="checkbox" name="publicoAlvo" value="Idosos em situação de vulnerabilidade"> Idosos em situação de vulnerabilidade</label>
+                        <label class="option"><input type="checkbox" name="publicoAlvo" value="Cuidadores formais e informais"> Cuidadores formais e informais</label>
+                        <label class="option"><input type="checkbox" name="publicoAlvo" value="Turistas seniores"> Turistas seniores</label>
+                        <label class="option"><input type="checkbox" name="publicoAlvo" value="Colaboradores seniores"> Colaboradores seniores</label>
+                        <label class="option"><input type="checkbox" name="publicoAlvo" value="População em geral"> População em geral</label>
+                    </div>
+                </fieldset>
+
+                <fieldset>
+                    <legend>Em que fase está? <span class="req">*</span></legend>
+                    <div class="options" id="maturidadeOptions">
+                        <label class="option"><input type="radio" name="maturidade" value="A explorar o tema"> A explorar o tema</label>
+                        <label class="option"><input type="radio" name="maturidade" value="Já existem algumas iniciativas"> Já existem algumas iniciativas</label>
+                        <label class="option"><input type="radio" name="maturidade" value="Projeto definido, procura apoio para implementar"> Projeto definido, procura apoio para implementar</label>
+                        <label class="option"><input type="radio" name="maturidade" value="Pretende certificar o que já faz"> Pretende certificar o que já faz</label>
+                    </div>
+                </fieldset>
+
+                <div class="form-group">
+                    <label for="prazo">Quando gostaria de começar?</label>
+                    <select id="prazo" name="prazo">
+                        <option value="">Selecione…</option>
+                        <option>Imediatamente</option>
+                        <option>Nos próximos 3 meses</option>
+                        <option>Nos próximos 6 meses</option>
+                        <option>Ainda sem data</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="descricao">Descreva brevemente o seu objetivo ou projeto <span class="req">*</span></label>
+                    <textarea id="descricao" name="descricao" required minlength="20" maxlength="2000" placeholder="Ex.: Queremos tornar o comércio do centro histórico mais acessível e atrativo para clientes seniores…"></textarea>
+                    <span class="hint"><span id="descricaoCount">0</span>/2000 caracteres (mínimo 20).</span>
+                </div>
+            </section>
+
+            <!-- ============ PASSO 4: CONFIRMAÇÃO ============ -->
+            <section class="step hidden" data-step="4">
+                <h2>4. Rever e enviar</h2>
+                <p class="intro">Confirme os dados antes de enviar.</p>
+
+                <div id="summary"></div>
+
+                <div class="consent">
+                    <p>
+                        Os dados deste formulário são tratados pela GoldAgeing com a finalidade exclusiva de analisar a
+                        candidatura e responder-lhe, nos termos do Regulamento Geral sobre a Proteção de Dados (RGPD).
+                        Pode pedir o acesso, a retificação ou a eliminação dos seus dados através de
+                        <a id="privacyEmail" href="mailto:info@goldageing.com">info@goldageing.com</a>.
+                    </p>
+                    <label class="option">
+                        <input type="checkbox" id="consentimentoRGPD" required>
+                        <span>Li e aceito o tratamento dos meus dados para análise desta candidatura. <span class="req">*</span></span>
+                    </label>
+                    <label class="option" style="margin-top: 10px;">
+                        <input type="checkbox" id="consentimentoMarketing">
+                        <span>Aceito receber informação sobre eventos, formações e oportunidades da GoldAgeing (opcional).</span>
+                    </label>
+                </div>
+            </section>
+
+            <!-- ============ SUCESSO ============ -->
+            <section class="hidden" id="successView">
+                <div class="success">
+                    <div class="icon">✅</div>
+                    <h2>Candidatura enviada com sucesso!</h2>
+                    <p>Obrigado pelo seu interesse. A equipa GoldAgeing vai analisar a candidatura e entrar em contacto consigo nos próximos dias úteis.</p>
+                    <div>A sua referência:</div>
+                    <div class="ref" id="successRef"></div>
+                    <p>Guarde esta referência para acompanhar o processo.</p>
+                    <div class="actions">
+                        <a class="btn btn-primary" id="successWhatsapp" target="_blank" rel="noopener">💬 Falar connosco no WhatsApp</a>
+                        <button type="button" class="btn btn-secondary" onclick="location.reload()">📝 Nova candidatura</button>
+                    </div>
+                </div>
+            </section>
+
+            <div class="nav-buttons" id="navButtons">
+                <button type="button" class="btn btn-secondary hidden" id="prevButton" onclick="prevStep()">← Anterior</button>
+                <button type="button" class="btn btn-primary" id="nextButton" onclick="nextStep()">Seguinte →</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="footer">GoldAgeing · Silver Economy · Territórios e serviços Senior-Friendly</div>
+
+<script>
+    // Configuração para publicação: cole aqui o bloco gerado em goldageing-config.html
+    // ("Copiar configuração para publicação"). Se ficar null, usa a configuração deste navegador.
+    const EMBEDDED_CONFIG = null;
+
+    const CONFIG_KEY = 'goldageing_config';
+    const SUBMISSIONS_KEY = 'goldageing_submissions';
+    const TOTAL_STEPS = 4;
+
+    const DISTRITOS = [
+        'Aveiro', 'Beja', 'Braga', 'Bragança', 'Castelo Branco', 'Coimbra', 'Évora', 'Faro',
+        'Guarda', 'Leiria', 'Lisboa', 'Portalegre', 'Porto', 'Santarém', 'Setúbal',
+        'Viana do Castelo', 'Vila Real', 'Viseu', 'Região Autónoma dos Açores',
+        'Região Autónoma da Madeira', 'Espanha', 'Outro país da UE', 'Fora da UE'
+    ];
+
+    let config = {};
+    let currentStep = 1;
+    let submitting = false;
+    const startedAt = Date.now();
+
+    // ---------- Utilitários ----------
+
+    function readJSON(key, fallback) {
+        try {
+            const raw = localStorage.getItem(key);
+            return raw ? JSON.parse(raw) : fallback;
+        } catch (e) {
+            return fallback;
+        }
+    }
+
+    function escapeHTML(value) {
+        return String(value ?? '').replace(/[&<>"']/g, c => ({
+            '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+        })[c]);
+    }
+
+    const $ = id => document.getElementById(id);
+    const val = id => $(id).value.trim();
+    const radio = name => (document.querySelector(`input[name="${name}"]:checked`) || {}).value || '';
+    const checks = name => Array.from(document.querySelectorAll(`input[name="${name}"]:checked`)).map(i => i.value);
+
+    // Validação do dígito de controlo do NIF português
+    function isValidNIF(nif) {
+        if (!/^[1-9]\d{8}$/.test(nif)) return false;
+        const sum = nif.slice(0, 8).split('').reduce((acc, d, i) => acc + Number(d) * (9 - i), 0);
+        const check = 11 - (sum % 11);
+        return Number(nif[8]) === (check >= 10 ? 0 : check);
+    }
+
+    function isValidPhone(phone) {
+        const digits = phone.replace(/[\s().-]/g, '');
+        return /^(\+|00)?\d{9,15}$/.test(digits);
+    }
+
+    function isValidEmail(email) {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email);
+    }
+
+    function isValidURL(url) {
+        try {
+            const u = new URL(url);
+            return u.protocol === 'http:' || u.protocol === 'https:';
+        } catch (e) {
+            return false;
+        }
+    }
+
+    // ---------- Erros ----------
+
+    function clearErrors() {
+        document.querySelectorAll('.field-error').forEach(e => e.remove());
+        document.querySelectorAll('.invalid').forEach(e => {
+            e.classList.remove('invalid');
+            e.removeAttribute('aria-invalid');
+        });
+        $('formError').classList.add('hidden');
+    }
+
+    function addError(element, message) {
+        element.classList.add('invalid');
+        element.setAttribute('aria-invalid', 'true');
+        const msg = document.createElement('div');
+        msg.className = 'field-error';
+        msg.textContent = message;
+        (element.closest('.form-group, fieldset') || element.parentElement).appendChild(msg);
+    }
+
+    function showFormError(message) {
+        const box = $('formError');
+        box.textContent = message;
+        box.classList.remove('hidden');
+        box.focus();
+    }
+
+    // ---------- Validação por passo ----------
+
+    function validateStep(step) {
+        clearErrors();
+        const errors = [];
+        const fail = (el, msg) => { addError(el, msg); errors.push(el); };
+
+        if (step === 1) {
+            if (!radio('tipo')) fail($('tipoOptions'), 'Escolha o tipo de entidade.');
+            if (val('entidade').length < 2) fail($('entidade'), 'Indique o nome da entidade.');
+            const nif = val('nif').replace(/\s/g, '');
+            if (nif && !isValidNIF(nif)) fail($('nif'), 'NIF inválido. Verifique os 9 dígitos.');
+            if (!val('distrito')) fail($('distrito'), 'Selecione o distrito ou região.');
+            if (val('concelho').length < 2) fail($('concelho'), 'Indique o concelho.');
+            if (val('website') && !isValidURL(val('website'))) fail($('website'), 'Indique um endereço completo, começado por https://');
+        }
+
+        if (step === 2) {
+            if (val('nome').length < 3) fail($('nome'), 'Indique o seu nome completo.');
+            if (!isValidEmail(val('email'))) fail($('email'), 'Indique um email válido.');
+            if (!isValidPhone(val('telefone'))) fail($('telefone'), 'Indique um número de telefone válido.');
+        }
+
+        if (step === 3) {
+            if (checks('servicos').length === 0) fail($('servicosOptions'), 'Escolha pelo menos um serviço.');
+            if (!radio('maturidade')) fail($('maturidadeOptions'), 'Indique em que fase está.');
+            if (val('descricao').length < 20) fail($('descricao'), 'Descreva o objetivo em pelo menos 20 caracteres.');
+        }
+
+        if (step === 4) {
+            if (!$('consentimentoRGPD').checked) fail($('consentimentoRGPD').closest('.option'), 'É necessário aceitar o tratamento de dados para enviar.');
+        }
+
+        if (errors.length) {
+            showFormError(`⚠️ Há ${errors.length} campo(s) a corrigir.`);
+            const first = errors[0].matches('input, select, textarea') ? errors[0] : errors[0].querySelector('input');
+            if (first) first.focus({ preventScroll: true });
+            errors[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+            return false;
+        }
+        return true;
+    }
+
+    // ---------- Navegação ----------
+
+    function showStep(step) {
+        currentStep = step;
+        document.querySelectorAll('section.step').forEach(s => s.classList.toggle('hidden', Number(s.dataset.step) !== step));
+        document.querySelectorAll('#progress li').forEach(li => {
+            const n = Number(li.dataset.step);
+            li.classList.toggle('active', n === step);
+            li.classList.toggle('done', n < step);
+            if (n === step) li.setAttribute('aria-current', 'step'); else li.removeAttribute('aria-current');
+        });
+
+        $('prevButton').classList.toggle('hidden', step === 1);
+        $('nextButton').textContent = step === TOTAL_STEPS ? '📨 Enviar candidatura' : 'Seguinte →';
+
+        if (step === TOTAL_STEPS) renderSummary();
+
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        const heading = document.querySelector(`section.step[data-step="${step}"] h2`);
+        heading.setAttribute('tabindex', '-1');
+        heading.focus({ preventScroll: true });
+    }
+
+    function nextStep() {
+        if (!validateStep(currentStep)) return;
+        if (currentStep < TOTAL_STEPS) showStep(currentStep + 1);
+        else submitApplication();
+    }
+
+    function prevStep() {
+        clearErrors();
+        if (currentStep > 1) showStep(currentStep - 1);
+    }
+
+    // ---------- Dados ----------
+
+    function collectData() {
+        const nif = val('nif').replace(/\s/g, '');
+        return {
+            tipo: radio('tipo'),
+            entidade: val('entidade'),
+            nif: nif,
+            colaboradores: val('colaboradores'),
+            distrito: val('distrito'),
+            concelho: val('concelho'),
+            website: val('website'),
+            nome: val('nome'),
+            cargo: val('cargo'),
+            email: val('email').toLowerCase(),
+            telefone: val('telefone'),
+            preferenciaContacto: radio('preferenciaContacto'),
+            servicos: checks('servicos'),
+            publicoAlvo: checks('publicoAlvo'),
+            maturidade: radio('maturidade'),
+            prazo: val('prazo'),
+            descricao: val('descricao')
+        };
+    }
+
+    function renderSummary() {
+        const d = collectData();
+        const section = (title, step, rows) => `
+            <div class="summary">
+                <h3>${title} <button type="button" onclick="showStep(${step})">Editar</button></h3>
+                <dl>${rows.filter(([, v]) => v && v.length !== 0).map(([k, v]) => `
+                    <dt>${k}</dt><dd>${escapeHTML(Array.isArray(v) ? v.join(', ') : v)}</dd>`).join('')}
+                </dl>
+            </div>`;
+
+        $('summary').innerHTML =
+            section('Entidade', 1, [
+                ['Tipo', d.tipo], ['Nome', d.entidade], ['NIF', d.nif], ['Colaboradores', d.colaboradores],
+                ['Localização', [d.concelho, d.distrito].filter(Boolean).join(', ')], ['Website', d.website]
+            ]) +
+            section('Pessoa de contacto', 2, [
+                ['Nome', d.nome], ['Cargo', d.cargo], ['Email', d.email], ['Telefone', d.telefone],
+                ['Preferência', d.preferenciaContacto]
+            ]) +
+            section('Interesse', 3, [
+                ['Serviços', d.servicos], ['Público-alvo', d.publicoAlvo], ['Fase', d.maturidade],
+                ['Início', d.prazo], ['Objetivo', d.descricao]
+            ]);
+    }
+
+    function generateReference() {
+        const date = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+        const random = Array.from(crypto.getRandomValues(new Uint8Array(3))).map(b => b.toString(16).padStart(2, '0')).join('').toUpperCase();
+        return `GA-${date}-${random}`;
+    }
+
+    async function submitApplication() {
+        if (submitting) return;
+
+        // Anti-spam: honeypot preenchido ou envio demasiado rápido para um humano
+        if ($('website_confirm').value || Date.now() - startedAt < 5000) {
+            showSuccess(generateReference());
+            return;
+        }
+
+        submitting = true;
+        const button = $('nextButton');
+        button.disabled = true;
+        button.textContent = '⏳ A enviar…';
+
+        const now = new Date().toISOString();
+        const reference = generateReference();
+        const submission = {
+            ...collectData(),
+            referencia: reference,
+            consentimentoRGPD: true,
+            consentimentoRGPDData: now,
+            consentimentoMarketing: $('consentimentoMarketing').checked,
+            origem: 'formulario-web',
+            status: 'nova',
+            submittedAt: now
+        };
+
+        try {
+            if (config.mode === 'firebase' && config.firebase && config.firebase.databaseURL) {
+                const response = await fetch(`${config.firebase.databaseURL}/submissions.json`, {
+                    method: 'POST',
+                    body: JSON.stringify(submission)
+                });
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            } else {
+                const stored = readJSON(SUBMISSIONS_KEY, []);
+                const list = Array.isArray(stored) ? stored : [];
+                list.push({ ...submission, id: `local_${Date.now()}_${reference}` });
+                localStorage.setItem(SUBMISSIONS_KEY, JSON.stringify(list));
+            }
+            showSuccess(reference);
+        } catch (e) {
+            submitting = false;
+            button.disabled = false;
+            button.textContent = '📨 Enviar candidatura';
+            const contact = config.email || 'info@goldageing.com';
+            showFormError(`❌ Não foi possível enviar a candidatura (${e.message}). Tente novamente dentro de alguns minutos ou contacte-nos através de ${contact}.`);
+        }
+    }
+
+    function showSuccess(reference) {
+        document.querySelectorAll('section.step').forEach(s => s.classList.add('hidden'));
+        $('navButtons').classList.add('hidden');
+        $('formError').classList.add('hidden');
+        document.querySelectorAll('#progress li').forEach(li => {
+            li.classList.remove('active');
+            li.classList.add('done');
+        });
+
+        $('successRef').textContent = reference;
+        const whatsapp = String(config.whatsapp || '').replace(/\D/g, '');
+        if (whatsapp) {
+            const text = `Olá GoldAgeing! Acabei de enviar a candidatura com a referência ${reference}.`;
+            $('successWhatsapp').href = `https://wa.me/${whatsapp}?text=${encodeURIComponent(text)}`;
+        } else {
+            $('successWhatsapp').classList.add('hidden');
+        }
+
+        $('successView').classList.remove('hidden');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // ---------- Inicialização ----------
+
+    window.addEventListener('DOMContentLoaded', () => {
+        config = EMBEDDED_CONFIG || readJSON(CONFIG_KEY, {});
+
+        $('distrito').insertAdjacentHTML('beforeend',
+            DISTRITOS.map(d => `<option value="${escapeHTML(d)}">${escapeHTML(d)}</option>`).join(''));
+
+        if (config.email) {
+            $('privacyEmail').href = `mailto:${config.email}`;
+            $('privacyEmail').textContent = config.email;
+        }
+
+        $('descricao').addEventListener('input', () => {
+            $('descricaoCount').textContent = $('descricao').value.length;
+        });
+
+        // Enter num campo de texto avança o passo em vez de submeter
+        $('applicationForm').addEventListener('keydown', e => {
+            if (e.key === 'Enter' && e.target.matches('input:not([type="checkbox"]):not([type="radio"])')) {
+                e.preventDefault();
+                nextStep();
+            }
+        });
+
+        showStep(1);
+        window.scrollTo(0, 0);
+    });
+</script>
+</body>
+</html>
