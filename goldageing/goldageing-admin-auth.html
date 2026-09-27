@@ -343,6 +343,10 @@
 </div>
 
 <script>
+    // Configuração para publicação: cole aqui o bloco gerado em goldageing-config.html
+    // ("Copiar configuração para publicação"). Se ficar null, usa a configuração deste navegador.
+    const EMBEDDED_CONFIG = null;
+
     const CONFIG_KEY = 'goldageing_config';
     const SUBMISSIONS_KEY = 'goldageing_submissions';
     const SESSION_KEY = 'goldageing_admin_session';
@@ -454,6 +458,79 @@
         return readJSON(localStorage, LOCKOUT_KEY, { attempts: 0, until: 0 });
     }
 
+    // ---------- Firebase Authentication (API REST) ----------
+
+    const AUTH_ERRORS = {
+        INVALID_LOGIN_CREDENTIALS: 'Credenciais inválidas.',
+        INVALID_PASSWORD: 'Credenciais inválidas.',
+        EMAIL_NOT_FOUND: 'Credenciais inválidas.',
+        INVALID_EMAIL: 'Credenciais inválidas.',
+        USER_DISABLED: 'Esta conta foi desativada no Firebase.',
+        TOO_MANY_ATTEMPTS_TRY_LATER: 'O Firebase bloqueou temporariamente o acesso por excesso de tentativas. Tente mais tarde.',
+        OPERATION_NOT_ALLOWED: 'O início de sessão por email/password não está ativo no Firebase Authentication.',
+        API_KEY_INVALID: 'A apiKey do Firebase não é válida. Verifique a configuração.'
+    };
+    const INVALID_CREDENTIAL_CODES = ['INVALID_LOGIN_CREDENTIALS', 'INVALID_PASSWORD', 'EMAIL_NOT_FOUND', 'INVALID_EMAIL'];
+
+    async function firebaseSignIn(email, password) {
+        const response = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${encodeURIComponent(config.firebase.apiKey)}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password, returnSecureToken: true })
+        });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) {
+            const code = ((data.error && data.error.message) || '').split(/[\s:]/)[0];
+            const error = new Error(AUTH_ERRORS[code] || `Erro de autenticação (${code || 'HTTP ' + response.status}).`);
+            error.invalidCredentials = INVALID_CREDENTIAL_CODES.includes(code);
+            throw error;
+        }
+        return {
+            username: data.email,
+            uid: data.localId,
+            idToken: data.idToken,
+            refreshToken: data.refreshToken,
+            tokenExpiresAt: Date.now() + Number(data.expiresIn) * 1000
+        };
+    }
+
+    // Devolve um ID token válido, renovando-o 5 minutos antes de expirar (duram 1 hora)
+    async function getIdToken() {
+        const session = getSession();
+        if (!session || session.mode !== 'firebase') throw new Error('sessão inválida');
+        if (session.tokenExpiresAt - Date.now() > 5 * 60 * 1000) return session.idToken;
+
+        const response = await fetch(`https://securetoken.googleapis.com/v1/token?key=${encodeURIComponent(config.firebase.apiKey)}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `grant_type=refresh_token&refresh_token=${encodeURIComponent(session.refreshToken)}`
+        });
+        if (!response.ok) {
+            logout('⏱️ A sessão expirou. Entre novamente.');
+            throw new Error('sessão expirada');
+        }
+        const data = await response.json();
+        session.idToken = data.id_token;
+        session.refreshToken = data.refresh_token;
+        session.tokenExpiresAt = Date.now() + Number(data.expires_in) * 1000;
+        sessionStorage.setItem(SESSION_KEY, JSON.stringify(session));
+        return session.idToken;
+    }
+
+    // Pedido autenticado à Realtime Database
+    async function dbRequest(path, options = {}) {
+        const token = await getIdToken();
+        const uid = getSession().uid;
+        const response = await fetch(`${config.firebase.databaseURL}/${path}.json?auth=${encodeURIComponent(token)}`, options);
+        if (response.status === 401 || response.status === 403) {
+            throw new Error(`sem permissão. Confirme que as regras de segurança estão publicadas e que existe /admins/${uid} = true na base de dados`);
+        }
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        return response.json();
+    }
+
+    // ---------- Sessão ----------
+
     async function handleLogin(event) {
         event.preventDefault();
         document.getElementById('loginError').classList.add('hidden');
@@ -467,37 +544,61 @@
 
         const username = document.getElementById('username').value.trim();
         const password = document.getElementById('password').value;
-        const passwordHash = await hashPassword(password);
+        const button = document.getElementById('loginButton');
+        button.disabled = true;
 
-        const valid = config.admin
-            && username === config.admin.username
-            && safeEqual(passwordHash, config.admin.passwordHash || '');
+        let session;
+        try {
+            if (isFirebase()) {
+                session = { mode: 'firebase', ...(await firebaseSignIn(username, password)) };
+            } else {
+                const passwordHash = await hashPassword(password);
+                const valid = config.admin
+                    && username === config.admin.username
+                    && safeEqual(passwordHash, config.admin.passwordHash || '');
+                if (!valid) {
+                    throw Object.assign(new Error('Credenciais inválidas.'), { invalidCredentials: true });
+                }
+                session = { mode: 'local', username };
+            }
+        } catch (e) {
+            button.disabled = false;
+            document.getElementById('password').value = '';
 
-        if (!valid) {
+            if (!e.invalidCredentials) {
+                showLoginError(e instanceof TypeError
+                    ? '❌ Não foi possível contactar o Firebase. Verifique a ligação à internet.'
+                    : `❌ ${e.message}`);
+                return;
+            }
+
             const attempts = lockout.attempts + 1;
             if (attempts >= MAX_ATTEMPTS) {
                 localStorage.setItem(LOCKOUT_KEY, JSON.stringify({ attempts: 0, until: Date.now() + LOCKOUT_MS }));
                 showLoginError('🔒 Demasiadas tentativas falhadas. Acesso bloqueado durante 5 minutos.');
             } else {
                 localStorage.setItem(LOCKOUT_KEY, JSON.stringify({ attempts, until: 0 }));
-                showLoginError(`❌ Credenciais inválidas. Restam ${MAX_ATTEMPTS - attempts} tentativa(s).`);
+                showLoginError(`❌ ${e.message} Restam ${MAX_ATTEMPTS - attempts} tentativa(s).`);
             }
-            document.getElementById('password').value = '';
             return;
         }
 
+        button.disabled = false;
         localStorage.removeItem(LOCKOUT_KEY);
-        sessionStorage.setItem(SESSION_KEY, JSON.stringify({
-            username,
-            expiresAt: Date.now() + SESSION_DURATION_MS
-        }));
+        session.expiresAt = Date.now() + SESSION_DURATION_MS;
+        sessionStorage.setItem(SESSION_KEY, JSON.stringify(session));
         document.getElementById('password').value = '';
         showDashboard();
     }
 
     function getSession() {
         const session = readJSON(sessionStorage, SESSION_KEY, null);
-        if (!session || session.expiresAt < Date.now() || !config.admin || session.username !== config.admin.username) {
+        const expectedMode = isFirebase() ? 'firebase' : 'local';
+        const valid = session
+            && session.expiresAt > Date.now()
+            && session.mode === expectedMode
+            && (session.mode === 'firebase' || (config.admin && session.username === config.admin.username));
+        if (!valid) {
             sessionStorage.removeItem(SESSION_KEY);
             return null;
         }
@@ -516,6 +617,7 @@
         sessionStorage.removeItem(SESSION_KEY);
         closeDetail();
         submissions = [];
+        document.getElementById('submissionsBody').innerHTML = '';
         document.getElementById('dashboardView').classList.add('hidden');
         document.getElementById('loginView').classList.remove('hidden');
         if (message) showLoginError(message);
@@ -537,14 +639,12 @@
 
         if (isFirebase()) {
             try {
-                const response = await fetch(`${config.firebase.databaseURL}/submissions.json`);
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                const data = await response.json() || {};
+                const data = await dbRequest('submissions') || {};
                 submissions = Object.entries(data).map(([id, sub]) => ({ ...sub, id }));
                 document.getElementById('sourceNote').textContent = `🔥 Dados carregados do Firebase (${config.firebase.projectId}).`;
             } catch (e) {
                 submissions = [];
-                document.getElementById('sourceNote').textContent = `❌ Não foi possível carregar do Firebase: ${e.message}. Verifique a configuração e as regras de segurança.`;
+                document.getElementById('sourceNote').textContent = `❌ Não foi possível carregar do Firebase: ${e.message}.`;
             }
         } else {
             const stored = readJSON(localStorage, SUBMISSIONS_KEY, []);
@@ -572,11 +672,10 @@
 
     async function persistUpdate(id, changes) {
         if (isFirebase()) {
-            const response = await fetch(`${config.firebase.databaseURL}/submissions/${encodeURIComponent(id)}.json`, {
+            await dbRequest(`submissions/${encodeURIComponent(id)}`, {
                 method: 'PATCH',
                 body: JSON.stringify(changes)
             });
-            if (!response.ok) throw new Error(`HTTP ${response.status}`);
         }
         const sub = submissions.find(s => s.id === id);
         Object.assign(sub, changes);
@@ -585,8 +684,7 @@
 
     async function persistDelete(id) {
         if (isFirebase()) {
-            const response = await fetch(`${config.firebase.databaseURL}/submissions/${encodeURIComponent(id)}.json`, { method: 'DELETE' });
-            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            await dbRequest(`submissions/${encodeURIComponent(id)}`, { method: 'DELETE' });
         }
         submissions = submissions.filter(s => s.id !== id);
         if (!isFirebase()) saveLocal();
@@ -759,13 +857,18 @@
     // ---------- Inicialização ----------
 
     window.addEventListener('DOMContentLoaded', () => {
-        config = readJSON(localStorage, CONFIG_KEY, {});
+        config = EMBEDDED_CONFIG || readJSON(localStorage, CONFIG_KEY, {});
 
         const statusOptions = Object.entries(STATUSES).map(([k, v]) => `<option value="${k}">${v}</option>`).join('');
         document.getElementById('statusFilter').insertAdjacentHTML('beforeend', statusOptions);
         document.getElementById('detailStatus').innerHTML = statusOptions;
 
-        if (!config.admin) {
+        if (isFirebase()) {
+            // Em produção, o acesso é feito com a conta do Firebase Authentication
+            document.querySelector('label[for="username"]').textContent = 'Email';
+            document.getElementById('username').type = 'email';
+            document.getElementById('username').autocomplete = 'email';
+        } else if (!config.admin) {
             document.getElementById('notConfigured').classList.remove('hidden');
             document.getElementById('loginButton').disabled = true;
             return;

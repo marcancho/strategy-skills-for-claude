@@ -303,7 +303,7 @@
 
                 <div class="form-group">
                     <label for="website">Website</label>
-                    <input type="url" id="website" name="website" placeholder="https://" autocomplete="url">
+                    <input type="url" id="website" name="website" maxlength="300" placeholder="https://" autocomplete="url">
                 </div>
             </section>
 
@@ -454,6 +454,10 @@
 <div class="footer">GoldAgeing · Silver Economy · Territórios e serviços Senior-Friendly</div>
 
 <script>
+    // Configuração para publicação: cole aqui o bloco gerado em goldageing-config.html
+    // ("Copiar configuração para publicação"). Se ficar null, usa a configuração deste navegador.
+    const EMBEDDED_CONFIG = null;
+
     const CONFIG_KEY = 'goldageing_config';
     const SUBMISSIONS_KEY = 'goldageing_submissions';
     const TOTAL_STEPS = 4;
@@ -753,7 +757,7 @@
     // ---------- Inicialização ----------
 
     window.addEventListener('DOMContentLoaded', () => {
-        config = readJSON(CONFIG_KEY, {});
+        config = EMBEDDED_CONFIG || readJSON(CONFIG_KEY, {});
 
         $('distrito').insertAdjacentHTML('beforeend',
             DISTRITOS.map(d => `<option value="${escapeHTML(d)}">${escapeHTML(d)}</option>`).join(''));
