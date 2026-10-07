@@ -35,3 +35,9 @@ Título: "Tecnologia que devolve autonomia." Texto: teleassistência, saúde dig
 Ilustração vetorial nas cores da marca (alternativa às fotografias, que o ambiente não conseguiu descarregar). Gerados com `html/render-ilustracoes.js`.
 - **D1 AgeTech** — "A distância deixou de ser um problema." Videochamada, saúde digital e teleassistência. Botão: "Descubra a AgeTech".
 - **D2 Senior-Friendly** — "Uma cidade boa para os 50+ é boa para todos." Certificação para municípios, comércio e turismo. Botão: "Peça o diagnóstico".
+
+## Criativos com a fotografia da campanha (E1, E2)
+Fotografia fornecida (`img/foto-campanha.jpg`, 768×1365) com fundo preto, aproveitado como espaço de texto. Gerados com `html/render-foto.js`.
+- **E1 Clientes** — "A geração 50+ não é o futuro. É o presente da economia." Diagnóstico, estratégia e Certificação Senior-Friendly. Botão: "Peça o diagnóstico". Objetivo Meta: Leads.
+- **E2 Seguidores** — "Aos 50+, a melhor fase começa agora." Botão: "Siga a GoldAgeing". Objetivo Meta: Engagement/seguidores.
+Nota: a fotografia tem resolução baixa para 1080×1920 (ampliada ~1,4×). Para publicar, usar a versão original em alta resolução.
