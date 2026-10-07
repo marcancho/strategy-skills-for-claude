@@ -58,7 +58,7 @@ body{font-variant-numeric:lining-nums;background:${c.grid?`radial-gradient(circl
 .tag{font-size:${tall?22:19}px;font-weight:600;letter-spacing:1.6px;text-transform:uppercase;color:${t.gold};border:2px solid ${t.gold};padding:10px 18px;border-radius:999px}
 .main{flex:1;display:flex;flex-direction:column;justify-content:center;gap:${tall?56:34}px}
 .eyebrow{font-size:${tall?26:22}px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:${t.muted};display:flex;align-items:center;gap:16px}
-.eyebrow:before{content:'';width:56px;height:3px;background:${t.gold}}
+
 h1{font-variant-numeric:lining-nums;font-family:'Playfair Display',serif;font-weight:700;font-size:${headSize}px;line-height:1.12;letter-spacing:-.5px;max-width:${tall?900:860}px}
 h1 em{font-style:italic;color:${t.gold};font-weight:600}
 .sub{font-size:${tall?36:30}px;line-height:1.4;color:${t.muted};max-width:820px}
