@@ -45,7 +45,7 @@ body{background:#000;color:#faf7f0;font-family:Inter,sans-serif;position:relativ
 .top{position:absolute;display:flex;justify-content:space-between;align-items:center;z-index:5}
 .logo{display:flex;align-items:center;gap:12px;font-family:'Playfair Display',serif;font-weight:700}.logo b{color:${G}}
 .tag{font-weight:600;letter-spacing:1.6px;text-transform:uppercase;color:${G};border:2px solid ${G};border-radius:999px;background:rgba(0,0,0,.35)}
-.eyebrow{font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#cfc6b2;display:flex;align-items:center;gap:14px}.eyebrow:before{content:'';width:50px;height:3px;background:${G}}
+.eyebrow{font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#cfc6b2;display:flex;align-items:center;gap:14px}
 h1{font-family:'Playfair Display',serif;font-weight:700;line-height:1.1;letter-spacing:-.5px}h1 em{font-style:italic;color:${G};font-weight:600}
 .sub{color:#e6dcc6;line-height:1.4}
 .btn{background:${G};color:#1c1a17;font-weight:700;border-radius:999px;display:inline-block;box-shadow:0 10px 30px rgba(0,0,0,.4)}
