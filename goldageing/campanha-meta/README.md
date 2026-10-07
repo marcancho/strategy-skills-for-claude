@@ -30,3 +30,8 @@ Para editar: alterar `html/render.js` e correr `node html/render.js <pasta>` (re
 
 ## Campanha C — AgeTech (C1)
 Título: "Tecnologia que devolve autonomia." Texto: teleassistência, saúde digital e casas inteligentes para viver com independência e segurança; escolhemos, financiamos e implementamos consigo. Botão: "Descubra a AgeTech". Público: IPSS, municípios, cuidadores e famílias; objetivo Leads ou Tráfego.
+
+## Criativos ilustrados (D1, D2)
+Ilustração vetorial nas cores da marca (alternativa às fotografias, que o ambiente não conseguiu descarregar). Gerados com `html/render-ilustracoes.js`.
+- **D1 AgeTech** — "A distância deixou de ser um problema." Videochamada, saúde digital e teleassistência. Botão: "Descubra a AgeTech".
+- **D2 Senior-Friendly** — "Uma cidade boa para os 50+ é boa para todos." Certificação para municípios, comércio e turismo. Botão: "Peça o diagnóstico".
