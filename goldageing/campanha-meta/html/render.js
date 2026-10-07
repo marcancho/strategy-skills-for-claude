@@ -24,6 +24,10 @@ const creatives = [
     stat:'1 em cada 4', cap:'portugueses tem 65 ou mais anos (23,4%).', src:'Fonte: INE, Censos 2021',
     head:'Está na hora de mudar a forma como falamos de <em>envelhecimento</em>.',
     cta:'Junte-se à conversa' },
+  { id:'C1-agetech', theme:'dark', grid:true, tag:'AgeTech', eyebrow:'Tecnologia com propósito',
+    head:'A tecnologia ao serviço de quem tem mais <em>experiência</em>.',
+    sub:'Teleassistência, saúde digital e casas inteligentes: ajudamos a escolher, financiar e implementar soluções AgeTech.',
+    cta:'Descubra como' },
 ];
 
 function rings(t, n=9) {
@@ -44,7 +48,7 @@ function html(c, fmt) {
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{width:${W}px;height:${H}px}
-body{font-variant-numeric:lining-nums;background:radial-gradient(120% 80% at 85% 10%, ${t.bg2} 0%, ${t.bg} 60%);color:${t.ink};font-family:Inter,sans-serif;position:relative;overflow:hidden}
+body{font-variant-numeric:lining-nums;background:${c.grid?`radial-gradient(circle, ${t.ring}0.35) 2px, transparent 2.5px) 0 0/42px 42px, `:''}radial-gradient(120% 80% at 85% 10%, ${t.bg2} 0%, ${t.bg} 60%);color:${t.ink};font-family:Inter,sans-serif;position:relative;overflow:hidden}
 .deco{position:absolute;right:-${tall?220:260}px;${tall?'top:120px':'top:-260px'};opacity:1}
 .deco2{position:absolute;left:-200px;bottom:-200px}
 .frame{position:absolute;inset:0;padding:${padTop}px ${padX}px ${padBot}px;display:flex;flex-direction:column}
