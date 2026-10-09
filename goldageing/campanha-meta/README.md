@@ -1,7 +1,7 @@
 # Campanha Meta — GoldAgeing (out. 2026)
 
 Criativos em 1:1 (1080×1080, Feed) e 9:16 (1080×1920, Stories/Reels). No 9:16 o texto fica fora das zonas seguras (topo ~250 px, base ~340 px).
-Para editar: alterar `html/render.js` e correr `node html/render.js <pasta>` (requer Playwright).
+Para editar: alterar `html/render-goldageing.js` e correr `node html/render-goldageing.js <pasta>` (requer Playwright).
 
 ## Campanha A — Angariar clientes (objetivo Meta: *Leads*, formulário instantâneo)
 
@@ -32,12 +32,26 @@ Para editar: alterar `html/render.js` e correr `node html/render.js <pasta>` (re
 Título: "Tecnologia que devolve autonomia." Texto: teleassistência, saúde digital e casas inteligentes para viver com independência e segurança; escolhemos, financiamos e implementamos consigo. Botão: "Descubra a AgeTech". Público: IPSS, municípios, cuidadores e famílias; objetivo Leads ou Tráfego.
 
 ## Criativos ilustrados (D1, D2)
-Ilustração vetorial nas cores da marca (alternativa às fotografias, que o ambiente não conseguiu descarregar). Gerados com `html/render-ilustracoes.js`.
+Ilustração vetorial nas cores da marca (alternativa às fotografias, que o ambiente não conseguiu descarregar). Gerados com `html/render-goldageing.js` (ilustrações em `html/ilustracoes-svg.js`).
 - **D1 AgeTech** — "A distância deixou de ser um problema." Videochamada, saúde digital e teleassistência. Botão: "Descubra a AgeTech".
 - **D2 Senior-Friendly** — "Uma cidade boa para os 50+ é boa para todos." Certificação para municípios, comércio e turismo. Botão: "Peça o diagnóstico".
 
 ## Criativos com a fotografia da campanha (E1, E2)
-Fotografia fornecida (`img/foto-campanha.jpg`, 768×1365) com fundo preto, aproveitado como espaço de texto. Gerados com `html/render-foto.js`.
+Fotografia fornecida (`img/foto-campanha.jpg`, 768×1365) com fundo preto, aproveitado como espaço de texto. Gerados com `html/render-goldageing.js`; fotografia recortada em `img/foto-recorte.png`.
 - **E1 Clientes** — "A geração 50+ não é o futuro. É o presente da economia." Diagnóstico, estratégia e Certificação Senior-Friendly. Botão: "Peça o diagnóstico". Objetivo Meta: Leads.
 - **E2 Seguidores** — "Aos 50+, a melhor fase começa agora." Botão: "Siga a GoldAgeing". Objetivo Meta: Engagement/seguidores.
 Nota: a fotografia tem resolução baixa para 1080×1920 (ampliada ~1,4×). Para publicar, usar a versão original em alta resolução.
+
+## Sistema visual GoldAgeing (aplicado a todos os criativos)
+Extraído de `goldageing/goldageing-config.html` e `goldageing-admin-auth.html`:
+
+| Elemento | Valor |
+|---|---|
+| Dourado | `#b8860b` · escuro `#8a6508` · claro `#f5e6c4` |
+| Fundo / texto / apoio | `#faf7f0` · `#2b2b2b` · `#666` · borda `#e6dcc6` |
+| Cabeçalho e fundo de destaque | gradiente 135° `#b8860b → #8a6508`, texto branco |
+| Cartões | brancos, borda `#e6dcc6`, raio 12 px, sombra suave |
+| Botões | gradiente dourado + texto branco (fundo creme) · branco + texto `#8a6508` (fundo dourado) |
+| Tipografia | sans-serif (Roboto; stack oficial -apple-system, Segoe UI, Roboto, Arial) |
+
+Dois temas: **dourado** (A1, A2, C1, D2) e **creme** (B1, B2, D1, E1, E2).

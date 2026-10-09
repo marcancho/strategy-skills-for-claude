@@ -1,7 +1,3 @@
-const { chromium } = require('playwright');
-const fs = require('fs');
-const OUT = process.argv[2];
-
 const rings = (cx, cy, stroke, n=7) => Array.from({length:n},(_,i)=>`<circle cx="${cx}" cy="${cy}" r="${(i+1)*55}" fill="none" stroke="${stroke}" stroke-opacity="${(0.5-i*0.06).toFixed(2)}" stroke-width="${(i+1)%3===0?3:1.5}"/>`).join('');
 
 // D1 — AgeTech: videochamada em família, saúde digital e teleassistência
@@ -95,41 +91,5 @@ ${buildings}
 <g><path d="M780 330 a42 42 0 1 1 84 0 c0 30-42 66-42 66 s-42-36-42-66z" fill="#c62828"/><circle cx="822" cy="330" r="16" fill="#faf7f0"/></g>
 </svg>`;
 
-const items = [
-  { id:'D1-agetech-ilustracao', theme:'cream', svg:svgAgetech, tag:'AgeTech', head:'A distância deixou de ser um <em>problema</em>.',
-    sub:'Videochamadas, teleassistência e saúde digital: a tecnologia que aproxima gerações.', cta:'Descubra a AgeTech' },
-  { id:'D2-senior-friendly-ilustracao', theme:'dark', svg:svgCidade, tag:'Senior-Friendly', head:'Uma cidade boa para os 50+ é boa para <em>todos</em>.',
-    sub:'Certificação Senior-Friendly para municípios, comércio e turismo.', cta:'Peça o diagnóstico' },
-];
-const T = { dark:{bg:'#1c1a17',bg2:'#2a2620',ink:'#faf7f0',muted:'#cfc6b2',gold:'#d4a62a',btn:'#1c1a17'}, cream:{bg:'#faf7f0',bg2:'#f3e9d2',ink:'#2b2b2b',muted:'#5e574b',gold:'#b8860b',btn:'#ffffff'} };
 
-const page = (c, fmt) => {
-  const t=T[c.theme], tall=fmt==='9x16', H=tall?1920:1080;
-  const padTop=tall?250:56, padBot=tall?340:56, cardH=tall?700:560, hs=tall?70:54, ss=tall?34:27, gap=tall?34:20;
-  return `<!doctype html><html><head><meta charset="utf-8"><link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"><style>
-*{margin:0;padding:0;box-sizing:border-box}html,body{width:1080px;height:${H}px}
-body{background:radial-gradient(120% 80% at 85% 10%,${t.bg2} 0%,${t.bg} 60%);color:${t.ink};font-family:Inter,sans-serif;font-variant-numeric:lining-nums;overflow:hidden}
-.f{position:absolute;inset:0;padding:${padTop}px 60px ${padBot}px;display:flex;flex-direction:column;gap:${gap}px}
-.top{display:flex;justify-content:space-between;align-items:center}
-.logo{display:flex;align-items:center;gap:12px;font-family:'Playfair Display',serif;font-weight:700;font-size:${tall?44:36}px}.logo b{color:${t.gold}}
-.tag{font-size:${tall?22:18}px;font-weight:600;letter-spacing:1.6px;text-transform:uppercase;color:${t.gold};border:2px solid ${t.gold};padding:9px 18px;border-radius:999px}
-.card{height:${cardH}px;border-radius:32px;overflow:hidden;flex:none;box-shadow:0 14px 40px rgba(0,0,0,.22)}.card svg{width:100%;height:100%;display:block}
-h1{font-family:'Playfair Display',serif;font-weight:700;font-size:${hs}px;line-height:1.1;letter-spacing:-.5px}h1 em{font-style:italic;color:${t.gold};font-weight:600}
-.sub{font-size:${ss}px;line-height:1.35;color:${t.muted}}
-.btn{margin-top:auto;align-self:flex-start;background:${t.gold};color:${t.btn};font-weight:700;font-size:${tall?36:29}px;padding:${tall?26:20}px ${tall?46:38}px;border-radius:999px;box-shadow:0 10px 30px rgba(0,0,0,.18)}
-</style></head><body><div class="f">
-<div class="top"><div class="logo"><svg width="${tall?52:44}" height="${tall?52:44}" viewBox="-25 -25 50 50"><circle r="22" fill="none" stroke="${t.gold}" stroke-width="3"/><circle r="14" fill="none" stroke="${t.gold}" stroke-width="2"/><circle r="6" fill="${t.gold}"/></svg><span>Gold<b>Ageing</b></span></div><div class="tag">${c.tag}</div></div>
-<div class="card">${c.svg}</div><h1>${c.head}</h1><p class="sub">${c.sub}</p><div class="btn">${c.cta} →</div>
-</div></body></html>`;
-};
-
-(async()=>{
-  const b = await chromium.launch();
-  for (const c of items) for (const fmt of ['1x1','9x16']) {
-    const p = await b.newPage({viewport:{width:1080,height:fmt==='1x1'?1080:1920}});
-    const h = page(c,fmt); fs.writeFileSync(`${OUT}/html/${c.id}_${fmt}.html`,h);
-    await p.setContent(h,{waitUntil:'networkidle'}); await p.evaluate(()=>document.fonts.ready);
-    await p.screenshot({path:`${OUT}/${c.id}_${fmt}.png`}); await p.close();
-  }
-  await b.close();
-})();
+module.exports = { svgAgetech, svgCidade };
